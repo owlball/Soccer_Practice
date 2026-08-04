@@ -36,15 +36,27 @@
   input[type=range] { width: 110px; accent-color: #5fe08a; }
   select {
     background: #161616; color: #f2f2f0; border: none;
-    padding: 10px 10px; font-size: 13px; max-width: 200px;
+    padding: 10px 26px 10px 10px; font-size: 13px; flex: 1 1 120px; min-width: 100px;
     text-transform: none; letter-spacing: normal;
+    -webkit-appearance: none; -moz-appearance: none; appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><path d="M0,0 L10,0 L5,6 Z" fill="%238a8a86"/></svg>');
+    background-repeat: no-repeat; background-position: right 10px center;
   }
-  #playsSelect { max-width: 340px; }
+  #playsSelect { flex: 3 1 260px; }
+  #browsePage select {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><path d="M0,0 L10,0 L5,6 Z" fill="%23d8cdf0"/></svg>');
+    background-repeat: no-repeat; background-position: right 10px center;
+  }
+  #categoryFilter, #levelFilter, #diagramFilter { flex: 1 1 140px; }
   #hint { flex: 1; min-width: 180px; text-transform: none; letter-spacing: normal; }
   #mainRow { flex: 1; min-height: 0; display: flex; gap: 10px; }
   #fieldWrap { flex: 1; min-height: 0; display: flex; }
   svg#field { width: 100%; height: 100%; display: block; border-radius: 4px; touch-action: none; }
-  .hidden { display: none; }
+  #diagramImage {
+    max-width: 100%; max-height: 100%; margin: auto;
+    object-fit: contain; border-radius: 4px; background: #ffffff;
+  }
+  .hidden { display: none !important; }
   #infoPanel {
     flex: 0 0 320px; background: #111611; border-radius: 4px;
     display: flex; flex-direction: column; overflow: hidden;
@@ -69,15 +81,164 @@
   #installNote {
     font-size: 12px; color: #6b6b68; text-align: center; padding: 2px 0;
   }
+  :root {
+    --theme-1: #5a1f7a; --theme-2: #3a1050; --theme-3: #1f0325;
+  }
+  #app[data-theme="red"]    { --theme-1: #7a2020; --theme-2: #501010; --theme-3: #250303; }
+  #app[data-theme="orange"] { --theme-1: #7a4a10; --theme-2: #502e08; --theme-3: #251202; }
+  #app[data-theme="teal"]   { --theme-1: #1f6a5a; --theme-2: #0f4438; --theme-3: #031f19; }
+  #app[data-theme="blue"]   { --theme-1: #20407a; --theme-2: #102550; --theme-3: #030d25; }
+  #pageNav { display: flex; gap: 8px; align-items: center; }
+  .navBtn { flex: 1; justify-content: center; background: #161616; opacity: 0.55; }
+  .navBtn.active { background: #1c2b1c; opacity: 1; color: #5fe08a; }
+  #themeSwatches { display: flex; gap: 6px; }
+  .swatch {
+    width: 22px; height: 22px; border-radius: 50%; border: 2px solid transparent;
+    padding: 0; cursor: pointer; clip-path: none; display: inline-block;
+  }
+  .swatch.active { border-color: #fff; }
+  #browsePage, #planPage {
+    flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px;
+    background: radial-gradient(circle at 20% 10%, var(--theme-1), var(--theme-2) 40%, var(--theme-3) 100%);
+    border-radius: 8px; padding: 12px;
+  }
+  #browsePage button, #planPage button {
+    background: rgba(255,255,255,0.12); clip-path: none; border-radius: 4px; color: #fff;
+  }
+  #browsePage button:active, #planPage button:active { background: rgba(255,255,255,0.2); }
+  #browsePage select {
+    background-color: rgba(255,255,255,0.1); color: #fff;
+  }
+  #browsePage label, #browsePage #hint { color: #d8cdf0; }
+  #installNote { color: #c9b8de !important; }
+  #infoPanel { background: rgba(15,0,20,0.4) !important; }
+  #infoPanelHeader { border-bottom: 1px solid rgba(255,255,255,0.08) !important; }
+  #infoPanelTitle { color: #f5f0fa !important; }
+  #infoPanelBody { color: #f0eaf5 !important; }
+  #infoPanelBody h4 { color: #b8a8d0 !important; }
+  svg#field { background: #3f8a5a; }
+  #planTopRow {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    background: rgba(255,255,255,0.08); border-radius: 6px; padding: 10px 14px;
+
+  }
+  #planTopRow label { color: #d8cdf0; }
+  #planTopRow input[type=time] {
+    background: rgba(255,255,255,0.12); color: #fff; border: none; padding: 8px 10px; font-size: 13px; border-radius: 4px;
+  }
+  #planTotalsText { font-size: 12px; color: #d8cdf0; }
+  #planSeedWarning {
+    background: rgba(120,20,20,0.4); color: #f2b8b0; font-size: 12px; padding: 8px 12px; border-radius: 4px;
+  }
+  #planTimeline {
+    display: flex; gap: 1px; border-radius: 6px; overflow: hidden; position: relative; height: 48px;
+    background: rgba(10,0,15,0.35); padding: 4px;
+  }
+  .timelineSeg {
+    display: flex; flex-direction: row; align-items: center; gap: 6px;
+    font-size: 10px; line-height: 1.3; overflow: hidden;
+    text-transform: none; letter-spacing: normal; position: relative;
+    padding: 4px 6px; border-radius: 3px;
+  }
+  .timelineSeg .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; background: rgba(255,255,255,0.5); }
+  .timelineSeg.type-break .dot, .timelineSeg.type-custom .dot, .timelineSeg.type-scrimmage .dot { background: #2fd6e0; }
+  .timelineSeg .segLabels { overflow: hidden; min-width: 0; }
+  .timelineSeg .segName { font-size: 11px; font-weight: 500; color: #f5f0fa; overflow:hidden; text-overflow:ellipsis; white-space: nowrap; }
+  .timelineSeg .segTime { color: #c9b8de; overflow:hidden; text-overflow:ellipsis; white-space: nowrap; }
+  .timelineSeg.selected { outline: 2px solid #2fd6e0; z-index: 1; }
+  #timelineNow {
+    position: absolute; top: -3px; bottom: -3px; width: 2px; background: #2fd6e0;
+    box-shadow: 0 0 5px #2fd6e0;
+  }
+  #addCustomRow { display: flex; gap: 8px; }
+  #customBlockName { flex: 1; background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 10px; font-size: 13px; border-radius: 4px; }
+  #customBlockName::placeholder { color: rgba(255,255,255,0.65); }
+  #customBlockType { background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 10px; font-size: 13px; border-radius: 4px; }
+  #customBlockMinutes { width: 60px; background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 10px; font-size: 13px; text-align: center; border-radius: 4px; }
+  #planMainRow { flex: 1; min-height: 0; display: flex; gap: 10px; }
+  #planLeftCol { flex: 0 1 640px; max-width: 640px; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
+  #planList {
+    flex: 1; overflow-y: auto; background: rgba(15,0,20,0.4); border-radius: 8px; padding: 4px 0;
+  }
+  .planItemHeaderRow {
+    display: flex; padding: 8px 14px; font-size: 10px; color: #c9b8de; font-weight: 600;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .planItem {
+    display: flex; align-items: center; gap: 8px; cursor: pointer;
+    padding: 9px 14px; border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .planItem:hover { background: rgba(255,255,255,0.04); }
+  .planItem .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; background: rgba(255,255,255,0.5); }
+  .planItem.type-break .dot, .planItem.type-custom .dot, .planItem.type-scrimmage .dot { background: #2fd6e0; }
+  .planItem.selected, .planItem.current { background: rgba(47,214,224,0.14); }
+  .planItem.current .dot { background: #2fd6e0; box-shadow: 0 0 4px #2fd6e0; }
+  .planItemBadge {
+    font-size: 9px; text-transform: uppercase; letter-spacing: 0.3px; padding: 2px 5px;
+    border-radius: 3px; flex-shrink: 0; background: rgba(255,255,255,0.1); color: #d8cdf0;
+  }
+  .planItemName { flex: 0 1 auto; max-width: 260px; font-size: 13px; color: #f5f0fa; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .planItemSplit { font-size: 10px; color: #b8a8d0; flex-shrink: 0; }
+  .planItemClock { font-size: 11px; color: #c9b8de; min-width: 92px; text-align: right; flex-shrink: 0; }
+  .planItem input[type=number] {
+    width: 46px; background: rgba(0,0,0,0.3); color: #fff; border: none; border-radius: 3px;
+    padding: 4px; font-size: 12px; text-align: center; flex-shrink: 0;
+  }
+  .planItemBtns { display: flex; gap: 3px; flex-shrink: 0; }
+  .planItemBtns button {
+    padding: 4px 5px; border-radius: 3px;
+  }
+  #planFooter { display: flex; gap: 8px; }
+  #planFooter button { flex: 1; justify-content: center; }
+  #planSession {
+    padding: 14px 16px; border-radius: 6px; background: rgba(255,255,255,0.08); text-align: center;
+  }
+  #planNowPlaying { font-size: 14px; color: #d8cdf0; margin-bottom: 4px; }
+  #planTimerDisplay { font-size: 32px; font-weight: 500; margin-bottom: 4px; color: #fff; }
+  #planElapsedText { font-size: 12px; color: #c9b8de; margin-bottom: 10px; }
+  #planSessionBtns { display: flex; gap: 8px; justify-content: center; }
+  #planEmpty { color: #b8a8d0; font-size: 13px; padding: 20px 8px; text-align: center; }
+  #planPreviewPanel {
+    flex: 1; min-height: 0; background: rgba(15,0,20,0.4); border-radius: 8px;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  #planPreviewHeader {
+    padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 13px; color: #c9b8de;
+    text-transform: none; letter-spacing: normal;
+  }
+  #planPreviewBody { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+  #planPreviewBody svg, #planPreviewBody img { width: 100%; max-height: 260px; object-fit: contain; border-radius: 4px; }
+  #planPreviewBody img { background: #ffffff; }
+  #planPreviewBody h4 {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px;
+    color: #b8a8d0; margin: 0 0 6px; font-weight: 500;
+  }
+  #planPreviewBody p { font-size: 13px; line-height: 1.6; color: #f0eaf5; margin: 0; }
+  #planPreviewBody ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.6; color: #f0eaf5; }
 </style>
 </head>
+
 <body>
-<div id="app">
+<div id="app" data-theme="purple">
+  <div id="pageNav">
+    <button id="navBrowseBtn" class="navBtn active"><i class="ti ti-list" aria-hidden="true"></i>Browse drills</button>
+    <button id="navPlanBtn" class="navBtn"><i class="ti ti-calendar-time" aria-hidden="true"></i>Plan practice</button>
+    <div id="themeSwatches">
+      <button class="swatch active" data-theme-choice="purple" style="background:#5a1f7a" aria-label="Purple theme"></button>
+      <button class="swatch" data-theme-choice="red" style="background:#7a2020" aria-label="Red theme"></button>
+      <button class="swatch" data-theme-choice="orange" style="background:#7a4a10" aria-label="Orange theme"></button>
+      <button class="swatch" data-theme-choice="teal" style="background:#1f6a5a" aria-label="Teal theme"></button>
+      <button class="swatch" data-theme-choice="blue" style="background:#20407a" aria-label="Blue theme"></button>
+    </div>
+  </div>
+  <div id="browsePage">
   <div id="controls-row">
     <button id="playBtn"><i class="ti ti-player-play-filled" aria-hidden="true"></i>Play</button>
     <label>Speed</label>
     <input type="range" id="speed" min="0.5" max="2" step="0.1" value="1">
     <span id="speedOut">1.0x</span>
+    <span style="flex:1"></span>
+    <button id="addToPlanBtn"><i class="ti ti-playlist-add" aria-hidden="true"></i>Add to plan</button>
   </div>
   <div id="controls-row">
     <label>Plays</label>
@@ -86,6 +247,20 @@
     <select id="minAge"><option value="">Min</option></select>
     <span>to</span>
     <select id="maxAge"><option value="">Max</option></select>
+  </div>
+  <div id="controls-row">
+    <label>Category</label>
+    <select id="categoryFilter"><option value="">All</option></select>
+    <label>Level cap</label>
+    <select id="levelFilter"><option value="">All</option></select>
+    <label>Diagram</label>
+    <select id="diagramFilter">
+      <option value="">All</option>
+      <option value="animated">Animated</option>
+      <option value="image">Image</option>
+      <option value="text">Text only</option>
+    </select>
+    <button id="resetFiltersBtn"><i class="ti ti-filter-off" aria-hidden="true"></i>Reset filters</button>
   </div>
   <div id="mainRow">
     <div id="fieldWrap">
@@ -117,6 +292,7 @@
         <g id="pathsLayer"></g>
         <g id="tokensLayer"></g>
       </svg>
+      <img id="diagramImage" class="hidden" alt="Drill diagram">
     </div>
     <div id="infoPanel">
       <div id="infoPanelHeader">
@@ -126,6 +302,51 @@
     </div>
   </div>
   <div id="installNote">Tip: tap Share → "Add to Home Screen" to use this full-screen like an app, offline.</div>
+  </div>
+  <div id="planPage" class="hidden">
+    <div id="planTopRow">
+      <label>Start time</label>
+      <input type="time" id="startTimeInput" value="17:30">
+      <span id="planTotalsText"></span>
+      <span style="flex:1"></span>
+      <button id="loadDefaultBtn"><i class="ti ti-wand" aria-hidden="true"></i>Load default itinerary</button>
+      <button id="planClearBtn"><i class="ti ti-trash" aria-hidden="true"></i>Clear plan</button>
+    </div>
+    <div id="planSeedWarning" class="hidden"></div>
+    <div id="planTimeline"></div>
+    <div id="planSession" class="hidden">
+      <div id="planNowPlaying"></div>
+      <div id="planTimerDisplay">00:00</div>
+      <div id="planElapsedText"></div>
+      <div id="planSessionBtns">
+        <button id="planPauseBtn"><i class="ti ti-player-pause" aria-hidden="true"></i>Pause</button>
+        <button id="planSkipBtn"><i class="ti ti-player-skip-forward" aria-hidden="true"></i>Skip</button>
+        <button id="planStopBtn"><i class="ti ti-player-stop" aria-hidden="true"></i>Stop</button>
+      </div>
+    </div>
+    <div id="planMainRow">
+      <div id="planLeftCol">
+        <div id="addCustomRow">
+          <input type="text" id="customBlockName" placeholder="Custom block name (e.g. Water break)">
+          <select id="customBlockType">
+            <option value="break">Break</option>
+            <option value="scrimmage">Scrimmage</option>
+            <option value="custom">Other</option>
+          </select>
+          <input type="number" id="customBlockMinutes" min="1" max="60" value="5">
+          <button id="addCustomBlockBtn"><i class="ti ti-plus" aria-hidden="true"></i>Add block</button>
+        </div>
+        <div id="planList"></div>
+        <div id="planFooter">
+          <button id="planStartBtn"><i class="ti ti-player-play" aria-hidden="true"></i>Start session</button>
+        </div>
+      </div>
+      <div id="planPreviewPanel">
+        <div id="planPreviewHeader">Tap a row to preview it here</div>
+        <div id="planPreviewBody"></div>
+      </div>
+    </div>
+  </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
@@ -157,6 +378,7 @@
     }
     populatePlaysSelect();
     loadSelectedPlay();
+    if(typeof seedDefaultItinerary === 'function') seedDefaultItinerary();
   }
 
   const PRESET_PLAYS = [
@@ -200,13 +422,14 @@
     }
   ];
   const svg = document.getElementById('field');
+  const diagramImage = document.getElementById('diagramImage');
   const pathsLayer = document.getElementById('pathsLayer');
   const tokensLayer = document.getElementById('tokensLayer');
   let tokens = [];
   let paths = {};
   let playing = false;
   let speed = 1;
-  let fieldBoundary = null;
+  let zoneBoxes = [];
   let zoneLines = [];
   let connectors = [];
 
@@ -236,9 +459,11 @@
     const d = drill.data || {};
     infoPanelTitle.textContent = drill.name || 'Drill';
     const hasDiagram = Array.isArray(d.tokens) && d.tokens.length;
+    const hasImage = !!d.diagram_image_url;
     const instr = d.instructions ? d.instructions.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : 'No instructions recorded.';
     let html = '';
-    if(!hasDiagram) html += '<p style="color:#8a8a86;">No diagram available yet for this one — text only.</p>';
+    if(!hasDiagram && hasImage) html += '<p style="color:#8a8a86;">Showing the original diagram image — not animated, but the real thing.</p>';
+    if(!hasDiagram && !hasImage) html += '<p style="color:#8a8a86;">No diagram available yet for this one — text only.</p>';
     html += '<h4>Instructions</h4><p>' + instr + '</p>';
     if(Array.isArray(d.coaching_points) && d.coaching_points.length){
       html += '<h4>Coaching points</h4><ul>' + d.coaching_points.map(p=>'<li>'+p+'</li>').join('') + '</ul>';
@@ -254,7 +479,7 @@
   function loadSetup(setupTokens, extra){
     tokens = []; paths = {};
     let countA = 0, countB = 0;
-    fieldBoundary = (extra && extra.fieldBoundary) || null;
+    zoneBoxes = (extra && extra.zoneBoxes) || [];
     zoneLines = (extra && extra.zoneLines) || [];
     connectors = (extra && extra.connectors) || [];
     setupTokens.forEach(t=>{
@@ -273,6 +498,9 @@
   const playsSelect = document.getElementById('playsSelect');
   const minAgeInput = document.getElementById('minAge');
   const maxAgeInput = document.getElementById('maxAge');
+  const categoryFilter = document.getElementById('categoryFilter');
+  const levelFilter = document.getElementById('levelFilter');
+  const diagramFilter = document.getElementById('diagramFilter');
   for(let age=2; age<=19; age++){
     const o1 = document.createElement('option'); o1.value=age; o1.textContent=age; minAgeInput.appendChild(o1);
     const o2 = document.createElement('option'); o2.value=age; o2.textContent=age; maxAgeInput.appendChild(o2);
@@ -291,11 +519,64 @@
     return true;
   }
 
+  function matchesCategoryFilter(d){
+    const val = categoryFilter.value;
+    if(!val) return true;
+    return (d.category || '') === val;
+  }
+
+  const LEVEL_RANK = { Beginner: 1, Intermediate: 2, Advanced: 3 };
+  function matchesLevelFilter(d){
+    const val = levelFilter.value;
+    if(!val) return true;
+    const levels = d.data && Array.isArray(d.data.skill_levels) ? d.data.skill_levels : [];
+    if(!levels.length) return false;
+    const maxRank = Math.max(...levels.map(l => LEVEL_RANK[l] || 0));
+    return maxRank <= LEVEL_RANK[val];
+  }
+
+  function diagramKind(d){
+    if(d.data && d.data.tokens && d.data.tokens.length) return 'animated';
+    if(d.data && d.data.diagram_image_url) return 'image';
+    return 'text';
+  }
+
+  function matchesDiagramFilter(d){
+    const val = diagramFilter.value;
+    if(!val) return true;
+    return diagramKind(d) === val;
+  }
+
+  function populateFilterOptions(){
+    const cats = new Set();
+    const levels = new Set();
+    dbDrills.forEach(d=>{
+      if(d.category) cats.add(d.category);
+      (d.data && d.data.skill_levels || []).forEach(l=>levels.add(l));
+    });
+    const prevCat = categoryFilter.value, prevLevel = levelFilter.value;
+    categoryFilter.innerHTML = '<option value="">All</option>';
+    Array.from(cats).sort().forEach(c=>{
+      const o = document.createElement('option'); o.value=c; o.textContent=c;
+      categoryFilter.appendChild(o);
+    });
+    categoryFilter.value = prevCat;
+    levelFilter.innerHTML = '<option value="">All</option>';
+    ['Beginner','Intermediate','Advanced'].filter(l=>levels.has(l)).forEach(l=>{
+      const o = document.createElement('option'); o.value=l; o.textContent=l;
+      levelFilter.appendChild(o);
+    });
+    levelFilter.value = prevLevel;
+  }
+
   function populatePlaysSelect(){
     playsSelect.innerHTML = '';
+    populateFilterOptions();
 
     if (dbDrills.length) {
-      const filtered = dbDrills.filter(matchesAgeFilter);
+      const filtered = dbDrills.filter(d =>
+        matchesAgeFilter(d) && matchesCategoryFilter(d) && matchesLevelFilter(d) && matchesDiagramFilter(d)
+      );
       const u6 = filtered.filter(d => d.age_group === 'U6').slice().sort((a,b)=>a.name.localeCompare(b.name));
       const others = filtered.filter(d => d.age_group !== 'U6').slice().sort((a,b)=>a.name.localeCompare(b.name));
 
@@ -305,11 +586,15 @@
         g.label = label;
         list.forEach(d => {
           const hasDiagram = d.data && d.data.tokens && d.data.tokens.length;
+          const hasImage = d.data && d.data.diagram_image_url;
           const ages = d.data && Array.isArray(d.data.ages) ? d.data.ages : null;
           const ageLabel = ages && ages.length ? ` (ages ${Math.min(...ages)}-${Math.max(...ages)})` : ' (no age data)';
+          let tag = '';
+          if(!hasDiagram && hasImage) tag = ' [image only]';
+          if(!hasDiagram && !hasImage) tag = ' [no diagram yet]';
           const opt = document.createElement('option');
           opt.value = 'db:' + d.id;
-          opt.textContent = d.name + ageLabel + (hasDiagram ? '' : ' [no diagram yet]');
+          opt.textContent = d.name + ageLabel + tag;
           g.appendChild(opt);
         });
         playsSelect.appendChild(g);
@@ -337,6 +622,42 @@
 
   minAgeInput.addEventListener('change', populatePlaysSelect);
   maxAgeInput.addEventListener('change', populatePlaysSelect);
+  categoryFilter.addEventListener('change', populatePlaysSelect);
+  levelFilter.addEventListener('change', populatePlaysSelect);
+  diagramFilter.addEventListener('change', populatePlaysSelect);
+  document.getElementById('resetFiltersBtn').addEventListener('click', ()=>{
+    minAgeInput.value = '';
+    maxAgeInput.value = '';
+    categoryFilter.value = '';
+    levelFilter.value = '';
+    diagramFilter.value = '';
+    populatePlaysSelect();
+  });
+
+  function applyDbDrill(drill){
+    if(!drill){ renderInfoPanel(); return; }
+    const tokens = drill.data && drill.data.tokens;
+    if(!tokens || !tokens.length){
+      loadSetup([]);
+      const imgUrl = drill.data && drill.data.diagram_image_url;
+      if(imgUrl){
+        diagramImage.src = imgUrl;
+        diagramImage.classList.remove('hidden');
+        svg.classList.add('hidden');
+      } else {
+        diagramImage.classList.add('hidden');
+        svg.classList.remove('hidden');
+      }
+    } else {
+      diagramImage.classList.add('hidden');
+      svg.classList.remove('hidden');
+      loadSetup(tokens, {
+        zoneBoxes: drill.data.zoneBoxes,
+        zoneLines: drill.data.zoneLines,
+        connectors: drill.data.connectors
+      });
+    }
+  }
 
   function loadSelectedPlay(){
     const val = playsSelect.value;
@@ -347,17 +668,10 @@
       loadSetup(PRESET_PLAYS[idx].tokens);
     } else if(type==='db'){
       const drill = dbDrills.find(d => String(d.id) === String(idxStr));
-      if(!drill){ renderInfoPanel(); return; }
-      const tokens = drill.data && drill.data.tokens;
-      if(!tokens || !tokens.length){
-        loadSetup([]);
-      } else {
-        loadSetup(tokens, {
-          fieldBoundary: drill.data.fieldBoundary,
-          zoneLines: drill.data.zoneLines,
-          connectors: drill.data.connectors
-        });
-      }
+      applyDbDrill(drill);
+    } else {
+      diagramImage.classList.add('hidden');
+      svg.classList.remove('hidden');
     }
     renderInfoPanel();
   }
@@ -409,14 +723,14 @@
     pathsLayer.innerHTML = '';
     tokensLayer.innerHTML = '';
 
-    if(fieldBoundary){
+    zoneBoxes.forEach(zb=>{
       const r = document.createElementNS('http://www.w3.org/2000/svg','rect');
-      r.setAttribute('x', fieldBoundary.x); r.setAttribute('y', fieldBoundary.y);
-      r.setAttribute('width', fieldBoundary.w); r.setAttribute('height', fieldBoundary.h);
+      r.setAttribute('x', zb.x); r.setAttribute('y', zb.y);
+      r.setAttribute('width', zb.w); r.setAttribute('height', zb.h);
       r.setAttribute('fill', 'none'); r.setAttribute('stroke', '#5fe08a');
       r.setAttribute('stroke-width', '2');
       pathsLayer.appendChild(r);
-    }
+    });
     zoneLines.forEach(zl=>{
       const l = document.createElementNS('http://www.w3.org/2000/svg','line');
       l.setAttribute('x1', zl.x1); l.setAttribute('y1', zl.y1);
@@ -504,6 +818,481 @@
       tokensLayer.appendChild(g);
     });
   }
+  // ---- Practice plan builder ----
+  const planList = document.getElementById('planList');
+  const planSession = document.getElementById('planSession');
+  const planNowPlaying = document.getElementById('planNowPlaying');
+  const planTimerDisplay = document.getElementById('planTimerDisplay');
+  const planElapsedText = document.getElementById('planElapsedText');
+  const planTimeline = document.getElementById('planTimeline');
+  const planTotalsText = document.getElementById('planTotalsText');
+  const startTimeInput = document.getElementById('startTimeInput');
+  const planSeedWarning = document.getElementById('planSeedWarning');
+
+  let planQueue = [];
+  try {
+    const saved = localStorage.getItem('practicePlan');
+    if(saved) planQueue = JSON.parse(saved);
+  } catch(e){ planQueue = []; }
+  try {
+    const savedStart = localStorage.getItem('practiceStartTime');
+    if(savedStart) startTimeInput.value = savedStart;
+  } catch(e){}
+
+  let session = { running:false, paused:false, index:-1, remaining:0, intervalId:null, startedAt:null, plannedTotalSec:0 };
+
+  function savePlan(){
+    try { localStorage.setItem('practicePlan', JSON.stringify(planQueue)); } catch(e){}
+  }
+
+  function formatTime(sec){
+    sec = Math.max(0, Math.round(sec));
+    const m = Math.floor(sec/60), s = sec%60;
+    return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  }
+
+  function parseStartTime(){
+    const [h,m] = (startTimeInput.value || '17:30').split(':').map(n=>parseInt(n,10));
+    const d = new Date();
+    d.setHours(h||0, m||0, 0, 0);
+    return d;
+  }
+
+  function formatClock(d){
+    let h = d.getHours(), m = d.getMinutes();
+    const ampm = h>=12 ? 'PM' : 'AM';
+    h = h%12; if(h===0) h=12;
+    return h+':'+String(m).padStart(2,'0')+' '+ampm;
+  }
+
+  // returns array of {item, startSec, endSec} cumulative offsets from practice start
+  function computeSchedule(){
+    let cum = 0;
+    return planQueue.map(item=>{
+      const startSec = cum;
+      cum += item.minutes*60;
+      return { item, startSec, endSec: cum };
+    });
+  }
+
+  function itemType(item){
+    if(item.type) return item.type;
+    return item.custom ? 'custom' : 'drill';
+  }
+
+  function renderTimeline(){
+    const schedule = computeSchedule();
+    const total = schedule.length ? schedule[schedule.length-1].endSec : 0;
+    const startTime = parseStartTime();
+    if(!total){
+      planTimeline.innerHTML = '';
+      planTotalsText.textContent = 'No blocks yet';
+      return;
+    }
+    const endTime = new Date(startTime.getTime() + total*1000);
+    planTotalsText.textContent = 'Total: ' + formatTime(total) + ' (' + formatClock(startTime) + ' \u2192 ' + formatClock(endTime) + ')';
+    planTimeline.innerHTML = '';
+    // Visual width is capped per segment (real minutes still drive scheduling/clock
+    // times) so one long block like a 20-minute scrimmage doesn't squeeze every
+    // other segment's text down to nothing.
+    const DISPLAY_CAP = 10;
+    schedule.forEach((seg, i)=>{
+      const type = itemType(seg.item);
+      const div = document.createElement('div');
+      div.className = 'timelineSeg type-' + type + (i===selectedPlanIndex ? ' selected' : '');
+      div.style.flex = Math.min(seg.item.minutes, DISPLAY_CAP) + ' 0 0';
+      div.addEventListener('click', ()=>{
+        selectedPlanIndex = i;
+        renderPlanList();
+        renderPlanPreview(seg.item);
+      });
+      const segClock = new Date(startTime.getTime() + seg.startSec*1000);
+      const dot = document.createElement('div');
+      dot.className = 'dot';
+      div.appendChild(dot);
+      const labels = document.createElement('div');
+      labels.className = 'segLabels';
+      const nameEl = document.createElement('div');
+      nameEl.className = 'segName';
+      nameEl.textContent = seg.item.name;
+      const timeEl = document.createElement('div');
+      timeEl.className = 'segTime';
+      timeEl.textContent = formatClock(segClock) + ' \u00b7 ' + seg.item.minutes + 'm' +
+        (type==='drill' && seg.item.minutes > 2 ? ' (2t+' + (seg.item.minutes-2) + 'p)' : '');
+      labels.appendChild(nameEl); labels.appendChild(timeEl);
+      div.appendChild(labels);
+      planTimeline.appendChild(div);
+    });
+    if(session.running){
+      const marker = document.createElement('div');
+      marker.id = 'timelineNow';
+      const elapsedSec = (Date.now() - session.startedAt)/1000;
+      const pct = Math.min(100, Math.max(0, (elapsedSec/total)*100));
+      marker.style.left = pct+'%';
+      planTimeline.appendChild(marker);
+    }
+  }
+
+  let selectedPlanIndex = -1;
+
+  function renderPlanList(){
+    const schedule = computeSchedule();
+    const startTime = parseStartTime();
+    planList.innerHTML = '';
+    const header = document.createElement('div');
+    header.className = 'planItemHeaderRow';
+    header.innerHTML = '<div style="flex:1">Block</div><div style="width:92px;text-align:right">Time</div>';
+    planList.appendChild(header);
+    if(!planQueue.length){
+      const empty = document.createElement('div');
+      empty.id = 'planEmpty';
+      empty.textContent = 'No drills queued yet. Go to Browse drills and tap "Add to plan", or add a custom block below.';
+      planList.appendChild(empty);
+    }
+    planQueue.forEach((item, i)=>{
+      const type = itemType(item);
+      const row = document.createElement('div');
+      row.className = 'planItem type-' + type
+        + (session.running && i===session.index ? ' current' : '')
+        + (i===selectedPlanIndex ? ' selected' : '');
+      row.addEventListener('click', ()=>{
+        selectedPlanIndex = i;
+        renderPlanList();
+        renderPlanPreview(item);
+      });
+      const dot = document.createElement('div');
+      dot.className = 'dot';
+      row.appendChild(dot);
+      const badge = document.createElement('span');
+      badge.className = 'planItemBadge type-' + type;
+      badge.textContent = type;
+      row.appendChild(badge);
+      const name = document.createElement('div');
+      name.className = 'planItemName';
+      name.textContent = (i+1) + '. ' + item.name;
+      row.appendChild(name);
+      if(type==='drill' && item.minutes > 2){
+        const split = document.createElement('div');
+        split.className = 'planItemSplit';
+        split.textContent = '2m talk + ' + (item.minutes-2) + 'm play';
+        row.appendChild(split);
+      }
+      const clockEl = document.createElement('div');
+      clockEl.className = 'planItemClock';
+      const seg = schedule[i];
+      const segStart = new Date(startTime.getTime() + seg.startSec*1000);
+      const segEnd = new Date(startTime.getTime() + seg.endSec*1000);
+      clockEl.textContent = formatClock(segStart) + ' - ' + formatClock(segEnd);
+      row.appendChild(clockEl);
+      const dur = document.createElement('input');
+      dur.type = 'number'; dur.min = '1'; dur.max = '60'; dur.value = item.minutes;
+      dur.addEventListener('click', e=>e.stopPropagation());
+      dur.addEventListener('change', ()=>{
+        item.minutes = Math.max(1, parseInt(dur.value,10) || 1);
+        savePlan(); renderPlanList(); renderTimeline();
+      });
+      row.appendChild(dur);
+      const btns = document.createElement('div');
+      btns.className = 'planItemBtns';
+      btns.addEventListener('click', e=>e.stopPropagation());
+      const upBtn = document.createElement('button');
+      upBtn.textContent = '\u25b2';
+      upBtn.setAttribute('aria-label', 'Move up');
+      upBtn.disabled = i===0;
+      upBtn.addEventListener('click', ()=>{
+        [planQueue[i-1], planQueue[i]] = [planQueue[i], planQueue[i-1]];
+        savePlan(); renderPlanList(); renderTimeline();
+      });
+      const downBtn = document.createElement('button');
+      downBtn.textContent = '\u25bc';
+      downBtn.setAttribute('aria-label', 'Move down');
+      downBtn.disabled = i===planQueue.length-1;
+      downBtn.addEventListener('click', ()=>{
+        [planQueue[i+1], planQueue[i]] = [planQueue[i], planQueue[i+1]];
+        savePlan(); renderPlanList(); renderTimeline();
+      });
+      const rmBtn = document.createElement('button');
+      rmBtn.textContent = '\u2715';
+      rmBtn.setAttribute('aria-label', 'Remove');
+      rmBtn.addEventListener('click', ()=>{
+        if(session.running && i===session.index) stopSession();
+        planQueue.splice(i,1);
+        savePlan(); renderPlanList(); renderTimeline();
+      });
+      btns.appendChild(upBtn); btns.appendChild(downBtn); btns.appendChild(rmBtn);
+      row.appendChild(btns);
+      planList.appendChild(row);
+    });
+    renderTimeline();
+  }
+
+  startTimeInput.addEventListener('change', ()=>{
+    try { localStorage.setItem('practiceStartTime', startTimeInput.value); } catch(e){}
+    renderPlanList();
+  });
+
+  // default duration: use the matching DEFAULT_ITINERARY value if this exact drill
+  // is part of it, otherwise fall back to 7 minutes (realistic attention span for
+  // young kids), not a generic 10.
+  function defaultDurationFor(name){
+    const match = DEFAULT_ITINERARY.find(d => d.name === name);
+    return match ? match.minutes : 7;
+  }
+
+  document.getElementById('addToPlanBtn').addEventListener('click', ()=>{
+    const val = playsSelect.value;
+    if(!val || val.split(':')[0] !== 'db') return;
+    const id = val.split(':')[1];
+    const drill = dbDrills.find(d => String(d.id) === String(id));
+    if(!drill) return;
+    planQueue.push({ id: drill.id, name: drill.name, minutes: defaultDurationFor(drill.name), type: 'drill' });
+    savePlan(); renderPlanList();
+  });
+
+  document.getElementById('addCustomBlockBtn').addEventListener('click', ()=>{
+    const nameInput = document.getElementById('customBlockName');
+    const minInput = document.getElementById('customBlockMinutes');
+    const typeInput = document.getElementById('customBlockType');
+    const name = nameInput.value.trim();
+    if(!name) return;
+    const minutes = Math.max(1, parseInt(minInput.value,10) || 5);
+    planQueue.push({ id: null, name, minutes, type: typeInput.value, custom: true });
+    nameInput.value = '';
+    savePlan(); renderPlanList();
+  });
+
+  // ---- page nav ----
+  const browsePage = document.getElementById('browsePage');
+  const planPage = document.getElementById('planPage');
+  const navBrowseBtn = document.getElementById('navBrowseBtn');
+  const navPlanBtn = document.getElementById('navPlanBtn');
+  function showPage(page){
+    browsePage.classList.toggle('hidden', page!=='browse');
+    planPage.classList.toggle('hidden', page!=='plan');
+    navBrowseBtn.classList.toggle('active', page==='browse');
+    navPlanBtn.classList.toggle('active', page==='plan');
+    if(page==='plan'){ renderPlanList(); }
+  }
+  navBrowseBtn.addEventListener('click', ()=>showPage('browse'));
+  navPlanBtn.addEventListener('click', ()=>showPage('plan'));
+
+  const appEl = document.getElementById('app');
+  const swatches = document.querySelectorAll('.swatch');
+  function applyTheme(name){
+    appEl.setAttribute('data-theme', name);
+    swatches.forEach(s => s.classList.toggle('active', s.dataset.themeChoice === name));
+    try { localStorage.setItem('boardTheme', name); } catch(e){}
+  }
+  swatches.forEach(s => s.addEventListener('click', ()=> applyTheme(s.dataset.themeChoice)));
+  try {
+    const savedTheme = localStorage.getItem('boardTheme');
+    if(savedTheme) applyTheme(savedTheme);
+  } catch(e){}
+
+  function buildStaticDiagramSVG(tokensArr, extra){
+    extra = extra || {};
+    let svg = '<svg viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">';
+    svg += '<defs><marker id="pvArrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#5fe08a"></path></marker></defs>';
+    svg += '<rect x="0" y="0" width="680" height="440" fill="#0f2e1a"></rect>';
+    svg += '<rect x="80" y="0" width="80" height="440" fill="#123822"></rect>';
+    svg += '<rect x="240" y="0" width="80" height="440" fill="#123822"></rect>';
+    svg += '<rect x="400" y="0" width="80" height="440" fill="#123822"></rect>';
+    svg += '<rect x="560" y="0" width="80" height="440" fill="#123822"></rect>';
+    svg += '<g stroke="#ffffff" stroke-width="1.5" fill="none" opacity="0.55">';
+    svg += '<rect x="20" y="20" width="640" height="400"></rect>';
+    svg += '<line x1="340" y1="20" x2="340" y2="420"></line>';
+    svg += '<circle cx="340" cy="220" r="50"></circle>';
+    svg += '<circle cx="340" cy="220" r="2.5" fill="#ffffff"></circle>';
+    svg += '</g>';
+    (extra.zoneBoxes||[]).forEach(zb=>{
+      svg += '<rect x="'+zb.x+'" y="'+zb.y+'" width="'+zb.w+'" height="'+zb.h+'" fill="none" stroke="#5fe08a" stroke-width="2"></rect>';
+    });
+    (extra.zoneLines||[]).forEach(zl=>{
+      svg += '<line x1="'+zl.x1+'" y1="'+zl.y1+'" x2="'+zl.x2+'" y2="'+zl.y2+'" stroke="#5fe08a" stroke-width="1.5" stroke-dasharray="3,3"></line>';
+    });
+    (extra.connectors||[]).forEach(cn=>{
+      svg += '<line x1="'+cn.x1+'" y1="'+cn.y1+'" x2="'+cn.x2+'" y2="'+cn.y2+'" stroke="#c8ff5c" stroke-width="2.5"></line>';
+    });
+    tokensArr.forEach(t=>{
+      if(t.path && t.path.length){
+        let d = 'M'+t.x+','+t.y;
+        t.path.forEach(p=>{ d += ' L'+p.x+','+p.y; });
+        svg += '<path d="'+d+'" fill="none" stroke="#5fe08a" stroke-width="2" stroke-dasharray="6,5" marker-end="url(#pvArrow)"></path>';
+      }
+    });
+    const drawOrder = {cone:0, ball:1, b:2, coach:2, a:3};
+    const sorted = tokensArr.slice().sort((x,y)=>(drawOrder[x.kind]??2)-(drawOrder[y.kind]??2));
+    let numA=0, numB=0;
+    sorted.forEach(t=>{
+      if(t.kind==='cone'){
+        const pts = (t.x-5)+','+(t.y+5)+' '+(t.x+5)+','+(t.y+5)+' '+t.x+','+(t.y-6);
+        svg += '<polygon points="'+pts+'" fill="#EF9F27" stroke="#0a0a0a" stroke-width="1.2"></polygon>';
+      } else if(t.kind==='ball'){
+        svg += '<circle cx="'+t.x+'" cy="'+t.y+'" r="6" fill="#ffffff" stroke="#0a0a0a" stroke-width="1.2"></circle>';
+        svg += '<circle cx="'+t.x+'" cy="'+t.y+'" r="2" fill="#0a0a0a"></circle>';
+      } else if(t.kind==='coach'){
+        svg += '<circle cx="'+t.x+'" cy="'+t.y+'" r="10" fill="#1e1e1c" stroke="#f2f2f0" stroke-width="1.2"></circle>';
+        svg += '<text x="'+t.x+'" y="'+(t.y+3.5)+'" text-anchor="middle" font-size="10" fill="#f2f2f0" font-family="-apple-system, sans-serif">C</text>';
+      } else {
+        const isA = t.kind==='a';
+        if(isA) numA++; else numB++;
+        svg += '<circle cx="'+t.x+'" cy="'+t.y+'" r="10" fill="'+(isA?'#378ADD':'#D85A30')+'" stroke="'+(isA?'#0C447C':'#712B13')+'" stroke-width="1.2"></circle>';
+        svg += '<text x="'+t.x+'" y="'+(t.y+3.5)+'" text-anchor="middle" font-size="10" fill="#ffffff" font-family="-apple-system, sans-serif">'+(isA?numA:numB)+'</text>';
+      }
+    });
+    svg += '</svg>';
+    return svg;
+  }
+
+  const planPreviewHeader = document.getElementById('planPreviewHeader');
+  const planPreviewBody = document.getElementById('planPreviewBody');
+
+  function renderPlanPreview(item){
+    const type = itemType(item);
+    if(type !== 'drill'){
+      planPreviewHeader.textContent = item.name;
+      planPreviewBody.innerHTML = '<p style="color:#8a8a86;">' + (item.note || 'No drill attached to this block.') + '</p>';
+      return;
+    }
+    const drill = dbDrills.find(d => String(d.id) === String(item.id));
+    if(!drill){
+      planPreviewHeader.textContent = item.name;
+      planPreviewBody.innerHTML = '<p style="color:#8a8a86;">Could not find this drill in the loaded data.</p>';
+      return;
+    }
+    planPreviewHeader.textContent = drill.name;
+    const d = drill.data || {};
+    let html = '';
+    if(Array.isArray(d.tokens) && d.tokens.length){
+      html += buildStaticDiagramSVG(d.tokens, { zoneBoxes: d.zoneBoxes, zoneLines: d.zoneLines, connectors: d.connectors });
+    } else if(d.diagram_image_url){
+      html += '<img src="'+d.diagram_image_url+'" alt="Drill diagram">';
+    } else {
+      html += '<p style="color:#8a8a86;">No diagram available yet for this one -- text only.</p>';
+    }
+    const instr = d.instructions ? d.instructions.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : 'No instructions recorded.';
+    html += '<div><h4>Instructions</h4><p>' + instr + '</p></div>';
+    if(Array.isArray(d.coaching_points) && d.coaching_points.length){
+      html += '<div><h4>Coaching points</h4><ul>' + d.coaching_points.map(p=>'<li>'+p+'</li>').join('') + '</ul></div>';
+    }
+    planPreviewBody.innerHTML = html;
+  }
+
+  function goToPlanIndex(i){
+    if(i<0 || i>=planQueue.length){ stopSession(); return; }
+    session.index = i;
+    const item = planQueue[i];
+    session.remaining = item.minutes*60;
+    if(item.custom){
+      infoPanelTitle.textContent = item.name;
+      infoPanelBody.innerHTML = '<p style="color:#8a8a86;">' + (item.note || 'No drill to display for this block.') + '</p>';
+    } else {
+      const drill = dbDrills.find(d => String(d.id) === String(item.id));
+      applyDbDrill(drill);
+      const opt = Array.from(playsSelect.options).find(o=>o.value==='db:'+item.id);
+      if(opt) playsSelect.value = opt.value;
+      renderInfoPanel();
+    }
+    planNowPlaying.textContent = 'Now: ' + item.name + ' (' + (i+1) + ' of ' + planQueue.length + ')';
+    planTimerDisplay.textContent = formatTime(session.remaining);
+    renderPlanList();
+  }
+
+  function tick(){
+    if(session.paused) return;
+    session.remaining--;
+    planTimerDisplay.textContent = formatTime(Math.max(session.remaining,0));
+    const elapsedSec = (Date.now() - session.startedAt)/1000;
+    const expectedClock = new Date(parseStartTime().getTime() + elapsedSec*1000);
+    planElapsedText.textContent = 'Elapsed ' + formatTime(elapsedSec) + ' of ' + formatTime(session.plannedTotalSec) +
+      ' \u00b7 actual time now should read about ' + formatClock(new Date()) + ' \u2014 planned clock: ' + formatClock(expectedClock);
+    renderTimeline();
+    if(session.remaining <= 0){
+      goToPlanIndex(session.index+1);
+    }
+  }
+
+  document.getElementById('planStartBtn').addEventListener('click', ()=>{
+    if(!planQueue.length) return;
+    session.running = true; session.paused = false;
+    session.startedAt = Date.now();
+    session.plannedTotalSec = planQueue.reduce((s,it)=>s+it.minutes*60, 0);
+    planSession.classList.remove('hidden');
+    if(session.intervalId) clearInterval(session.intervalId);
+    session.intervalId = setInterval(tick, 1000);
+    goToPlanIndex(0);
+  });
+
+  function stopSession(){
+    session.running = false; session.paused = false; session.index = -1;
+    if(session.intervalId){ clearInterval(session.intervalId); session.intervalId=null; }
+    planSession.classList.add('hidden');
+    renderPlanList();
+  }
+  document.getElementById('planStopBtn').addEventListener('click', stopSession);
+
+  document.getElementById('planPauseBtn').addEventListener('click', (e)=>{
+    session.paused = !session.paused;
+    e.currentTarget.innerHTML = session.paused
+      ? '<i class="ti ti-player-play" aria-hidden="true"></i>Resume'
+      : '<i class="ti ti-player-pause" aria-hidden="true"></i>Pause';
+  });
+
+  document.getElementById('planSkipBtn').addEventListener('click', ()=>{
+    goToPlanIndex(session.index+1);
+  });
+
+  document.getElementById('planClearBtn').addEventListener('click', ()=>{
+    stopSession();
+    planQueue = [];
+    savePlan(); renderPlanList();
+  });
+
+  const DEFAULT_ITINERARY = [
+    { name: 'Red Light/Green Light', minutes: 5, type: 'drill' },
+    { name: 'Hungry, Hungry Hippos', minutes: 7, type: 'drill' },
+    { name: 'Water break', minutes: 3, custom: true, type: 'break', note: 'August evening heat + young kids -- keep this non-negotiable.' },
+    { name: 'Boston Bulldogs', minutes: 7, type: 'drill' },
+    { name: 'Sid the Sloth vs Crash & Eddy', minutes: 7, type: 'drill' },
+    { name: 'Water break', minutes: 3, custom: true, type: 'break', note: 'Second break -- also a good bathroom check for this age group.' },
+    { name: 'Combat to Small Goals', minutes: 6, type: 'drill' },
+    { name: 'Water + line up for scrimmage', minutes: 2, custom: true, type: 'break', note: 'Split into two 3v3 groups here.' },
+    { name: 'Scrimmage (3v3) vs other team', minutes: 20, custom: true, type: 'scrimmage', note: 'Rotate all 6 kids through evenly -- e.g. swap at the 10-minute mark so everyone gets ~10 min of game time.' }
+  ];
+
+  function normalizeName(s){
+    return (s||'').trim().toLowerCase().replace(/\s+/g,' ');
+  }
+
+  document.getElementById('loadDefaultBtn').addEventListener('click', ()=>{
+    if(planQueue.length && !confirm('This replaces your current plan with the default itinerary. Continue?')) return;
+    const built = [];
+    const missed = [];
+    DEFAULT_ITINERARY.forEach(item=>{
+      if(item.custom){
+        built.push({ id: null, name: item.name, minutes: item.minutes, custom: true, type: item.type, note: item.note });
+      } else {
+        let drill = dbDrills.find(d => d.name === item.name);
+        if(!drill) drill = dbDrills.find(d => normalizeName(d.name) === normalizeName(item.name));
+        if(drill){
+          built.push({ id: drill.id, name: drill.name, minutes: item.minutes, type: 'drill' });
+        } else {
+          missed.push(item.name);
+        }
+      }
+    });
+    planQueue = built;
+    savePlan(); renderPlanList();
+    if(missed.length){
+      planSeedWarning.classList.remove('hidden');
+      planSeedWarning.textContent = 'Could not find these drills in your Supabase data (check exact spelling/name there): ' + missed.join(', ');
+    } else {
+      planSeedWarning.classList.add('hidden');
+    }
+  });
+
+  renderPlanList();
+
   render();
 })();
 </script>
