@@ -18,6 +18,7 @@
     overscroll-behavior: none;
     user-select: none;
   }
+  body.mode-light { background: #ece7f2; color: #221a2e; }
   #app { display: flex; flex-direction: column; height: 100%; padding: 8px; gap: 6px; }
   button {
     background: #161616; color: #f2f2f0; border: none;
@@ -47,10 +48,13 @@
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><path d="M0,0 L10,0 L5,6 Z" fill="%23d8cdf0"/></svg>');
     background-repeat: no-repeat; background-position: right 10px center;
   }
+  #app[data-mode="light"] #browsePage select {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><path d="M0,0 L10,0 L5,6 Z" fill="%234a3a5a"/></svg>');
+  }
   #categoryFilter, #levelFilter, #diagramFilter { flex: 1 1 140px; }
   #hint { flex: 1; min-width: 180px; text-transform: none; letter-spacing: normal; }
   #mainRow { flex: 1; min-height: 0; display: flex; gap: 10px; }
-  #fieldWrap { flex: 1; min-height: 0; display: flex; }
+  #fieldWrap { flex: 1; min-height: 0; display: flex; background: transparent; }
   svg#field { width: 100%; height: 100%; display: block; border-radius: 4px; touch-action: none; }
   #diagramImage {
     max-width: 100%; max-height: 100%; margin: auto;
@@ -83,11 +87,56 @@
   }
   :root {
     --theme-1: #5a1f7a; --theme-2: #3a1050; --theme-3: #1f0325;
+    --surface-hover: rgba(255,255,255,0.04);
+    --surface-weak: rgba(255,255,255,0.06);
+    --surface-med: rgba(255,255,255,0.08);
+    --surface-strong: rgba(255,255,255,0.1);
+    --surface-btn: rgba(255,255,255,0.12);
+    --surface-selected: rgba(255,255,255,0.14);
+    --surface-btn-active: rgba(255,255,255,0.2);
+    --dot-muted: rgba(255,255,255,0.5);
+    --placeholder: rgba(255,255,255,0.65);
+    --text-primary: #f5f0fa;
+    --text-secondary: #d8cdf0;
+    --text-muted: #c9b8de;
+    --text-mutedmore: #b8a8d0;
+    --text-body: #f0eaf5;
+    --panel-bg: rgba(15,0,20,0.4);
   }
   #app[data-theme="red"]    { --theme-1: #7a2020; --theme-2: #501010; --theme-3: #250303; }
   #app[data-theme="orange"] { --theme-1: #7a4a10; --theme-2: #502e08; --theme-3: #251202; }
   #app[data-theme="teal"]   { --theme-1: #1f6a5a; --theme-2: #0f4438; --theme-3: #031f19; }
   #app[data-theme="blue"]   { --theme-1: #20407a; --theme-2: #102550; --theme-3: #030d25; }
+  #app[data-mode="light"] {
+    --surface-hover: rgba(0,0,0,0.04);
+    --surface-weak: rgba(0,0,0,0.06);
+    --surface-med: rgba(0,0,0,0.07);
+    --surface-strong: rgba(0,0,0,0.06);
+    --surface-btn: rgba(0,0,0,0.08);
+    --surface-selected: rgba(14,138,150,0.16);
+    --surface-btn-active: rgba(0,0,0,0.14);
+    --dot-muted: rgba(0,0,0,0.35);
+    --placeholder: rgba(0,0,0,0.4);
+    --text-primary: #221a2e;
+    --text-secondary: #4a3a5a;
+    --text-muted: #6a5a7a;
+    --text-mutedmore: #7a6a8a;
+    --text-body: #2a2036;
+    --panel-bg: rgba(255,255,255,0.5);
+  }
+  #app[data-theme="purple"][data-mode="light"] { --theme-1: #f3e9fb; --theme-2: #e6d3f5; --theme-3: #d8b9ee; }
+  #app[data-theme="red"][data-mode="light"]    { --theme-1: #fbe9e9; --theme-2: #f5d0d0; --theme-3: #eeb0b0; }
+  #app[data-theme="orange"][data-mode="light"] { --theme-1: #fbeee0; --theme-2: #f5dcbc; --theme-3: #eec894; }
+  #app[data-theme="teal"][data-mode="light"]   { --theme-1: #e3f5ef; --theme-2: #c5e9dc; --theme-3: #a3dbc6; }
+  #app[data-theme="blue"][data-mode="light"]   { --theme-1: #e6eefb; --theme-2: #c9dcf3; --theme-3: #a6c5ea; }
+  #app[data-mode="light"] #browsePage button, #app[data-mode="light"] #planPage button { color: #221a2e; }
+  #app[data-mode="light"] .navBtn { background: rgba(0,0,0,0.06); color: #4a3a5a; }
+  #app[data-mode="light"] .navBtn.active { background: rgba(14,138,150,0.16); color: #0e8a96; }
+  #app[data-mode="light"] #customBlockName,
+  #app[data-mode="light"] #customBlockType,
+  #app[data-mode="light"] #customBlockMinutes,
+  #app[data-mode="light"] #planTopRow input[type=time] { color: #221a2e; }
+  #app[data-mode="light"] svg#field { background: transparent; }
   #pageNav { display: flex; gap: 8px; align-items: center; }
   .navBtn { flex: 1; justify-content: center; background: #161616; opacity: 0.55; }
   .navBtn.active { background: #1c2b1c; opacity: 1; color: #5fe08a; }
@@ -103,30 +152,30 @@
     border-radius: 8px; padding: 12px;
   }
   #browsePage button, #planPage button {
-    background: rgba(255,255,255,0.12); clip-path: none; border-radius: 4px; color: #fff;
+    background: var(--surface-btn); clip-path: none; border-radius: 4px; color: var(--text-primary);
   }
-  #browsePage button:active, #planPage button:active { background: rgba(255,255,255,0.2); }
+  #browsePage button:active, #planPage button:active { background: var(--surface-btn-active); }
   #browsePage select {
-    background-color: rgba(255,255,255,0.1); color: #fff;
+    background-color: var(--surface-strong); color: var(--text-primary);
   }
-  #browsePage label, #browsePage #hint { color: #d8cdf0; }
-  #installNote { color: #c9b8de !important; }
-  #infoPanel { background: rgba(15,0,20,0.4) !important; }
-  #infoPanelHeader { border-bottom: 1px solid rgba(255,255,255,0.08) !important; }
-  #infoPanelTitle { color: #f5f0fa !important; }
-  #infoPanelBody { color: #f0eaf5 !important; }
-  #infoPanelBody h4 { color: #b8a8d0 !important; }
-  svg#field { background: #3f8a5a; }
+  #browsePage label, #browsePage #hint { color: var(--text-secondary); }
+  #installNote { color: var(--text-muted) !important; }
+  #infoPanel { background: var(--panel-bg) !important; }
+  #infoPanelHeader { border-bottom: 1px solid var(--surface-med) !important; }
+  #infoPanelTitle { color: var(--text-primary) !important; }
+  #infoPanelBody { color: var(--text-body) !important; }
+  #infoPanelBody h4 { color: var(--text-mutedmore) !important; }
+  svg#field { background: transparent; }
   #planTopRow {
     display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-    background: rgba(255,255,255,0.08); border-radius: 6px; padding: 10px 14px;
+    background: var(--surface-med); border-radius: 6px; padding: 10px 14px;
 
   }
-  #planTopRow label { color: #d8cdf0; }
+  #planTopRow label { color: var(--text-secondary); }
   #planTopRow input[type=time] {
-    background: rgba(255,255,255,0.12); color: #fff; border: none; padding: 8px 10px; font-size: 13px; border-radius: 4px;
+    background: var(--surface-btn); color: var(--text-primary); border: none; padding: 8px 10px; font-size: 13px; border-radius: 4px;
   }
-  #planTotalsText { font-size: 12px; color: #d8cdf0; }
+  #planTotalsText { font-size: 12px; color: var(--text-secondary); }
   #planSeedWarning {
     background: rgba(120,20,20,0.4); color: #f2b8b0; font-size: 12px; padding: 8px 12px; border-radius: 4px;
   }
@@ -140,46 +189,46 @@
     text-transform: none; letter-spacing: normal; position: relative;
     padding: 4px 6px; border-radius: 3px;
   }
-  .timelineSeg .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; background: rgba(255,255,255,0.5); }
+  .timelineSeg .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; background: var(--dot-muted); }
   .timelineSeg.type-break .dot, .timelineSeg.type-custom .dot, .timelineSeg.type-scrimmage .dot { background: #2fd6e0; }
   .timelineSeg .segLabels { overflow: hidden; min-width: 0; }
-  .timelineSeg .segName { font-size: 11px; font-weight: 500; color: #f5f0fa; overflow:hidden; text-overflow:ellipsis; white-space: nowrap; }
-  .timelineSeg .segTime { color: #c9b8de; overflow:hidden; text-overflow:ellipsis; white-space: nowrap; }
+  .timelineSeg .segName { font-size: 11px; font-weight: 500; color: var(--text-primary); overflow:hidden; text-overflow:ellipsis; white-space: nowrap; }
+  .timelineSeg .segTime { color: var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space: nowrap; }
   .timelineSeg.selected { outline: 2px solid #2fd6e0; z-index: 1; }
   #timelineNow {
     position: absolute; top: -3px; bottom: -3px; width: 2px; background: #2fd6e0;
     box-shadow: 0 0 5px #2fd6e0;
   }
   #addCustomRow { display: flex; gap: 8px; }
-  #customBlockName { flex: 1; background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 10px; font-size: 13px; border-radius: 4px; }
-  #customBlockName::placeholder { color: rgba(255,255,255,0.65); }
-  #customBlockType { background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 10px; font-size: 13px; border-radius: 4px; }
-  #customBlockMinutes { width: 60px; background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 10px; font-size: 13px; text-align: center; border-radius: 4px; }
+  #customBlockName { flex: 1; background: var(--surface-strong); color: var(--text-primary); border: none; padding: 10px; font-size: 13px; border-radius: 4px; }
+  #customBlockName::placeholder { color: var(--placeholder); }
+  #customBlockType { background: var(--surface-strong); color: var(--text-primary); border: none; padding: 10px; font-size: 13px; border-radius: 4px; }
+  #customBlockMinutes { width: 60px; background: var(--surface-strong); color: var(--text-primary); border: none; padding: 10px; font-size: 13px; text-align: center; border-radius: 4px; }
   #planMainRow { flex: 1; min-height: 0; display: flex; gap: 10px; }
   #planLeftCol { flex: 0 1 640px; max-width: 640px; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
   #planList {
-    flex: 1; overflow-y: auto; background: rgba(15,0,20,0.4); border-radius: 8px; padding: 4px 0;
+    flex: 1; overflow-y: auto; background: var(--panel-bg); border-radius: 8px; padding: 4px 0;
   }
   .planItemHeaderRow {
-    display: flex; padding: 8px 14px; font-size: 10px; color: #c9b8de; font-weight: 600;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex; padding: 8px 14px; font-size: 10px; color: var(--text-muted); font-weight: 600;
+    border-bottom: 1px solid var(--surface-med);
   }
   .planItem {
     display: flex; align-items: center; gap: 8px; cursor: pointer;
-    padding: 9px 14px; border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 9px 14px; border-bottom: 1px solid var(--surface-weak);
   }
-  .planItem:hover { background: rgba(255,255,255,0.04); }
-  .planItem .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; background: rgba(255,255,255,0.5); }
+  .planItem:hover { background: var(--surface-hover); }
+  .planItem .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; background: var(--dot-muted); }
   .planItem.type-break .dot, .planItem.type-custom .dot, .planItem.type-scrimmage .dot { background: #2fd6e0; }
   .planItem.selected, .planItem.current { background: rgba(47,214,224,0.14); }
   .planItem.current .dot { background: #2fd6e0; box-shadow: 0 0 4px #2fd6e0; }
   .planItemBadge {
     font-size: 9px; text-transform: uppercase; letter-spacing: 0.3px; padding: 2px 5px;
-    border-radius: 3px; flex-shrink: 0; background: rgba(255,255,255,0.1); color: #d8cdf0;
+    border-radius: 3px; flex-shrink: 0; background: var(--surface-strong); color: var(--text-secondary);
   }
-  .planItemName { flex: 0 1 auto; max-width: 260px; font-size: 13px; color: #f5f0fa; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .planItemSplit { font-size: 10px; color: #b8a8d0; flex-shrink: 0; }
-  .planItemClock { font-size: 11px; color: #c9b8de; min-width: 92px; text-align: right; flex-shrink: 0; }
+  .planItemName { flex: 0 1 auto; max-width: 260px; font-size: 13px; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .planItemSplit { font-size: 10px; color: var(--text-mutedmore); flex-shrink: 0; }
+  .planItemClock { font-size: 11px; color: var(--text-muted); min-width: 92px; text-align: right; flex-shrink: 0; }
   .planItem input[type=number] {
     width: 46px; background: rgba(0,0,0,0.3); color: #fff; border: none; border-radius: 3px;
     padding: 4px; font-size: 12px; text-align: center; flex-shrink: 0;
@@ -191,19 +240,19 @@
   #planFooter { display: flex; gap: 8px; }
   #planFooter button { flex: 1; justify-content: center; }
   #planSession {
-    padding: 14px 16px; border-radius: 6px; background: rgba(255,255,255,0.08); text-align: center;
+    padding: 14px 16px; border-radius: 6px; background: var(--surface-med); text-align: center;
   }
-  #planNowPlaying { font-size: 14px; color: #d8cdf0; margin-bottom: 4px; }
-  #planTimerDisplay { font-size: 32px; font-weight: 500; margin-bottom: 4px; color: #fff; }
-  #planElapsedText { font-size: 12px; color: #c9b8de; margin-bottom: 10px; }
+  #planNowPlaying { font-size: 14px; color: var(--text-secondary); margin-bottom: 4px; }
+  #planTimerDisplay { font-size: 32px; font-weight: 500; margin-bottom: 4px; color: var(--text-primary); }
+  #planElapsedText { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
   #planSessionBtns { display: flex; gap: 8px; justify-content: center; }
-  #planEmpty { color: #b8a8d0; font-size: 13px; padding: 20px 8px; text-align: center; }
+  #planEmpty { color: var(--text-mutedmore); font-size: 13px; padding: 20px 8px; text-align: center; }
   #planPreviewPanel {
-    flex: 1; min-height: 0; background: rgba(15,0,20,0.4); border-radius: 8px;
+    flex: 1; min-height: 0; background: var(--panel-bg); border-radius: 8px;
     display: flex; flex-direction: column; overflow: hidden;
   }
   #planPreviewHeader {
-    padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 13px; color: #c9b8de;
+    padding: 14px 16px; border-bottom: 1px solid var(--surface-med); font-size: 13px; color: var(--text-muted);
     text-transform: none; letter-spacing: normal;
   }
   #planPreviewBody { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
@@ -211,15 +260,42 @@
   #planPreviewBody img { background: #ffffff; }
   #planPreviewBody h4 {
     font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px;
-    color: #b8a8d0; margin: 0 0 6px; font-weight: 500;
+    color: var(--text-mutedmore); margin: 0 0 6px; font-weight: 500;
   }
-  #planPreviewBody p { font-size: 13px; line-height: 1.6; color: #f0eaf5; margin: 0; }
-  #planPreviewBody ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.6; color: #f0eaf5; }
+  #planPreviewBody p { font-size: 13px; line-height: 1.6; color: var(--text-body); margin: 0; }
+  #planPreviewBody ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.6; color: var(--text-body); }
+
+  @media (max-width: 700px) {
+    #app { padding: 6px; gap: 4px; }
+    #pageNav { flex-wrap: wrap; gap: 6px; }
+    #themeSwatches { order: 3; width: 100%; justify-content: center; margin-top: 4px; }
+    #controls-row { gap: 6px; }
+    select { min-width: 0; flex: 1 1 80px; }
+    #playsSelect { flex: 1 1 100%; order: -1; }
+
+    #mainRow { flex-direction: column; }
+    #fieldWrap { flex: 0 0 38vh; min-height: 180px; }
+    #infoPanel { flex: 1; min-height: 120px; }
+
+    #planMainRow { flex-direction: column; }
+    #planLeftCol { flex: 1 1 auto; max-width: none; }
+    #planPreviewPanel { flex: 0 0 220px; min-height: 180px; }
+
+    #planTimeline { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .timelineSeg { min-width: 78px; flex-shrink: 0; }
+
+    .planItem { flex-wrap: wrap; }
+    .planItemName { max-width: none; flex: 1 1 100%; order: -1; margin-bottom: 2px; }
+    .planItemClock { min-width: 0; }
+
+    #addCustomRow { flex-wrap: wrap; }
+    #customBlockName { flex: 1 1 100%; }
+  }
 </style>
 </head>
 
 <body>
-<div id="app" data-theme="purple">
+<div id="app" data-theme="purple" data-mode="dark">
   <div id="pageNav">
     <button id="navBrowseBtn" class="navBtn active"><i class="ti ti-list" aria-hidden="true"></i>Browse drills</button>
     <button id="navPlanBtn" class="navBtn"><i class="ti ti-calendar-time" aria-hidden="true"></i>Plan practice</button>
@@ -230,6 +306,7 @@
       <button class="swatch" data-theme-choice="teal" style="background:#1f6a5a" aria-label="Teal theme"></button>
       <button class="swatch" data-theme-choice="blue" style="background:#20407a" aria-label="Blue theme"></button>
     </div>
+    <button id="modeToggleBtn" aria-label="Toggle light/dark mode">☾</button>
   </div>
   <div id="browsePage">
   <div id="controls-row">
@@ -1089,6 +1166,21 @@
     if(savedTheme) applyTheme(savedTheme);
   } catch(e){}
 
+  const modeToggleBtn = document.getElementById('modeToggleBtn');
+  function applyMode(mode){
+    appEl.setAttribute('data-mode', mode);
+    document.body.classList.toggle('mode-light', mode==='light');
+    modeToggleBtn.textContent = mode==='light' ? '\u2600' : '\u263e';
+    try { localStorage.setItem('boardMode', mode); } catch(e){}
+  }
+  modeToggleBtn.addEventListener('click', ()=>{
+    applyMode(appEl.getAttribute('data-mode')==='light' ? 'dark' : 'light');
+  });
+  try {
+    const savedMode = localStorage.getItem('boardMode');
+    if(savedMode) applyMode(savedMode);
+  } catch(e){}
+
   function buildStaticDiagramSVG(tokensArr, extra){
     extra = extra || {};
     let svg = '<svg viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">';
@@ -1178,11 +1270,38 @@
     planPreviewBody.innerHTML = html;
   }
 
-  function goToPlanIndex(i){
+  let audioCtx = null;
+  function unlockAudio(){
+    try {
+      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if(audioCtx.state === 'suspended') audioCtx.resume();
+    } catch(e){}
+  }
+  function playAlertBeep(){
+    if(!audioCtx) return;
+    try {
+      const now = audioCtx.currentTime;
+      [0, 0.18].forEach(offset=>{
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine'; osc.frequency.value = 880;
+        gain.gain.setValueAtTime(0.0001, now+offset);
+        gain.gain.exponentialRampToValueAtTime(0.3, now+offset+0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now+offset+0.16);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(now+offset); osc.stop(now+offset+0.17);
+      });
+    } catch(e){}
+  }
+
+  function goToPlanIndex(i, opts){
+    opts = opts || {};
     if(i<0 || i>=planQueue.length){ stopSession(); return; }
+    const wasIndex = session.index;
     session.index = i;
     const item = planQueue[i];
-    session.remaining = item.minutes*60;
+    const schedule = computeSchedule();
+    session.remaining = opts.remaining != null ? opts.remaining : item.minutes*60;
     if(item.custom){
       infoPanelTitle.textContent = item.name;
       infoPanelBody.innerHTML = '<p style="color:#8a8a86;">' + (item.note || 'No drill to display for this block.') + '</p>';
@@ -1196,31 +1315,54 @@
     planNowPlaying.textContent = 'Now: ' + item.name + ' (' + (i+1) + ' of ' + planQueue.length + ')';
     planTimerDisplay.textContent = formatTime(session.remaining);
     renderPlanList();
-  }
-
-  function tick(){
-    if(session.paused) return;
-    session.remaining--;
-    planTimerDisplay.textContent = formatTime(Math.max(session.remaining,0));
-    const elapsedSec = (Date.now() - session.startedAt)/1000;
-    const expectedClock = new Date(parseStartTime().getTime() + elapsedSec*1000);
-    planElapsedText.textContent = 'Elapsed ' + formatTime(elapsedSec) + ' of ' + formatTime(session.plannedTotalSec) +
-      ' \u00b7 actual time now should read about ' + formatClock(new Date()) + ' \u2014 planned clock: ' + formatClock(expectedClock);
-    renderTimeline();
-    if(session.remaining <= 0){
-      goToPlanIndex(session.index+1);
+    if(!opts.silent && wasIndex !== -1 && wasIndex !== i){
+      playAlertBeep();
     }
   }
 
+  // Recompute which block we should be on and how much time is actually left,
+  // from real elapsed wall-clock time -- not from counting setInterval ticks.
+  // This is what keeps things correct after the screen locks/sleeps and the
+  // interval gets throttled or suspended by the browser.
+  function syncSessionToElapsed(){
+    if(!session.running || session.paused) return;
+    const schedule = computeSchedule();
+    const elapsedSec = (Date.now() - session.startedAt)/1000;
+    if(elapsedSec >= session.plannedTotalSec){ stopSession(); return; }
+    let idx = schedule.findIndex(seg => elapsedSec < seg.endSec);
+    if(idx === -1) idx = schedule.length-1;
+    const remaining = schedule[idx].endSec - elapsedSec;
+    if(idx !== session.index){
+      goToPlanIndex(idx, { remaining });
+    } else {
+      session.remaining = remaining;
+      planTimerDisplay.textContent = formatTime(session.remaining);
+    }
+    const expectedClock = new Date(parseStartTime().getTime() + elapsedSec*1000);
+    planElapsedText.textContent = 'Elapsed ' + formatTime(elapsedSec) + ' of ' + formatTime(session.plannedTotalSec) +
+      ' \u00b7 actual time now: ' + formatClock(new Date()) + ' \u2014 planned clock: ' + formatClock(expectedClock);
+    renderTimeline();
+  }
+
+  function tick(){
+    syncSessionToElapsed();
+  }
+
+  document.addEventListener('visibilitychange', ()=>{
+    if(!document.hidden) syncSessionToElapsed();
+  });
+  window.addEventListener('focus', syncSessionToElapsed);
+
   document.getElementById('planStartBtn').addEventListener('click', ()=>{
     if(!planQueue.length) return;
+    unlockAudio();
     session.running = true; session.paused = false;
     session.startedAt = Date.now();
     session.plannedTotalSec = planQueue.reduce((s,it)=>s+it.minutes*60, 0);
     planSession.classList.remove('hidden');
     if(session.intervalId) clearInterval(session.intervalId);
     session.intervalId = setInterval(tick, 1000);
-    goToPlanIndex(0);
+    goToPlanIndex(0, { silent: true });
   });
 
   function stopSession(){
