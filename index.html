@@ -121,6 +121,10 @@
     color: #a8d4ff; background: rgba(50,140,255,0.1); border-left: 3px solid #4fa3ff;
   }
   .adaptedNote.akaNote b { color: #7ac0ff; }
+  .adaptedNote.coachNote {
+    color: #b8f0c8; background: rgba(95,224,138,0.1); border-left: 3px solid #5fe08a;
+    font-size: 12px; margin-bottom: 8px;
+  }
   .adaptedNote b { color: #ffcf7a; }
   #installNote {
     font-size: 12px; color: #6b6b68; text-align: center; padding: 2px 0;
@@ -782,7 +786,9 @@
     if(d.adapted_note) html += '<div class="adaptedNote"><b>Adapted for our team:</b> ' + d.adapted_note + '</div>';
     html += '<h4>Instructions</h4><p>' + instr + '</p>';
     if(Array.isArray(d.coaching_points) && d.coaching_points.length){
-      html += '<h4>Coaching points</h4><ul>' + d.coaching_points.map(p=>'<li>'+p+'</li>').join('') + '</ul>';
+      html += '<h4>Coaching points</h4>';
+      if(d.coaching_points_written_by_coach) html += '<div class="adaptedNote coachNote">These coaching points were written to fit the real drill mechanic -- PlayMetrics never had real ones for this drill.</div>';
+      html += '<ul>' + d.coaching_points.map(p=>'<li>'+p+'</li>').join('') + '</ul>';
     }
     infoPanelBody.innerHTML = html;
   }
@@ -2224,7 +2230,9 @@ const STANDARD_PLANS = [
     if(d.adapted_note) html += '<div class="adaptedNote"><b>Adapted for our team:</b> ' + d.adapted_note + '</div>';
     html += '<div><h4>Instructions</h4><p>' + instr + '</p></div>';
     if(Array.isArray(d.coaching_points) && d.coaching_points.length){
-      html += '<div><h4>Coaching points</h4><ul>' + d.coaching_points.map(p=>'<li>'+p+'</li>').join('') + '</ul></div>';
+      html += '<div><h4>Coaching points</h4>' +
+        (d.coaching_points_written_by_coach ? '<div class="adaptedNote coachNote">These coaching points were written to fit the real drill mechanic -- PlayMetrics never had real ones for this drill.</div>' : '') +
+        '<ul>' + d.coaching_points.map(p=>'<li>'+p+'</li>').join('') + '</ul></div>';
     }
     return { title: drill.name, html: html };
   }
@@ -2278,7 +2286,9 @@ const STANDARD_PLANS = [
     if(d.adapted_note) html += '<div class="adaptedNote"><b>Adapted for our team:</b> ' + d.adapted_note + '</div>';
     html += '<div><h4>Instructions</h4><p>' + instr + '</p></div>';
     if(Array.isArray(d.coaching_points) && d.coaching_points.length){
-      html += '<div><h4>Coaching points</h4><ul>' + d.coaching_points.map(p=>'<li>'+p+'</li>').join('') + '</ul></div>';
+      html += '<div><h4>Coaching points</h4>' +
+        (d.coaching_points_written_by_coach ? '<div class="adaptedNote coachNote">These coaching points were written to fit the real drill mechanic -- PlayMetrics never had real ones for this drill.</div>' : '') +
+        '<ul>' + d.coaching_points.map(p=>'<li>'+p+'</li>').join('') + '</ul></div>';
     }
     planPreviewBody.innerHTML = html;
   }
