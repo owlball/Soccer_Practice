@@ -414,17 +414,24 @@
   <div id="settingsPage" class="hidden">
     <div id="settingsSection">
       <h3>About this app</h3>
-      <p>This board loads real soccer drills from a Supabase database (sourced from PlayMetrics) and helps you plan and run practices for young players. There are 290 drills total; 22 are tagged specifically for this team's age group, and 16 of those actually scale down to a 6-player team.</p>
-      <p>One thing worth knowing: <b>Hungry, Hungry Hippos</b> and <b>Boston Bulldogs</b> are the same drill as <b>Crocs in the River</b> -- same grid, same "cross without being caught" mechanic, just different costumes. The 8 standard practices only use Crocs in the River for that game, so it isn't accidentally repeated under three different names.</p>
+      <p>This board loads real soccer drills from a Supabase database (sourced from PlayMetrics) and helps you plan and run practices for young players. There are 290 drills total; 32 are tagged specifically for this team's age group, and 23 of those actually scale down to a 6-player team and feed the 8 standard practices.</p>
+      <p>A few drills turned out to be the exact same game under a different theme -- only one version of each is used in the standard practices, and the drill you'll actually see (when you tap into it) says so:</p>
+      <ul>
+        <li><b>Crocs in the River</b> covers Hungry, Hungry Hippos, Boston Bulldogs, and Bruce the Shark vs Nemo -- same "cross without being caught" mechanic, different costumes.</li>
+        <li><b>Bulldogs Hunting for Milk-Bones</b> covers Tigers vs Rabbits (Winnie the Pooh) and Good Minions vs Evil Minions -- same "hit below the knee to score" mechanic.</li>
+        <li><b>Triangle Gate Challenge with Guards</b> covers Monsters Inc -- same triangle-zone, 2-taggers mechanic.</li>
+        <li><b>Combat to Small Goals</b> covers Soccer Combat -- same coach-serves-a-ball, race-to-score mechanic.</li>
+      </ul>
     </div>
     <div id="settingsSection">
       <h3>How to use it</h3>
       <ul>
         <li><b>Browse drills</b> — filter by age, category, skill level, or diagram type. Tap Play to animate real movement paths where diagram data exists.</li>
         <li><b>Add to plan</b> sends the currently selected drill to whichever practice is open on the Plan tab — check the plan selector there if it's not where you expect.</li>
-        <li><b>Plan practice</b> — pick from the 8 standard practices (pre-built from approved drills) or create your own with "New plan."</li>
-        <li><b>Tap any row</b> in a plan to expand it — that's where duration, reorder, and remove controls live, along with the drill's diagram and instructions.</li>
-        <li><b>Standard plans</b> can be edited (durations, order, removals), but only <b>custom plans</b> let you add brand-new blocks like water breaks or a scrimmage. "Reset to standard" restores a standard plan's original drills if you've changed it.</li>
+        <li><b>Plan practice</b> — pick from the 8 standard practices (fixed, pre-built from approved drills) or create your own with "New plan."</li>
+        <li><b>Tap any row</b> in a plan to preview it — that's where the drill's diagram and instructions show up on the right (or below, on a phone).</li>
+        <li><b>Standard plans are read-only</b> — durations, order, and content are fixed on purpose, so they always match what's actually approved and can't drift or go stale. If you want a version you can edit, tap <b>"Duplicate as new plan"</b> to make your own editable copy with the same starting content.</li>
+        <li>An <b>amber note</b> on a drill means it's been adapted for a 6-player group (a tweaked rule). A <b>blue note</b> means it's flagging a duplicate drill under another name, like the ones listed above.</li>
         <li><b>Start session</b> runs a live timer synced to real wall-clock time, so it stays accurate even if the screen locks mid-practice.</li>
       </ul>
     </div>
