@@ -6,7 +6,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Soccer Board">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css">
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -363,11 +366,12 @@
     #app { padding: 6px; gap: 4px; }
     #pageNav {
       position: fixed; bottom: 0; left: 0; right: 0; z-index: 20;
-      background: #0a0a0a; padding: 8px; margin: 0; gap: 8px;
+      background: #0a0a0a; padding: 4px; margin: 0; gap: 6px;
       box-shadow: 0 -2px 8px rgba(0,0,0,0.4);
     }
-    .navBtn { font-size: 11px; padding: 10px 4px; line-height: 1.3; }
-    #app { padding-bottom: 64px; }
+    .navBtn { font-size: 10px; padding: 8px 2px; line-height: 1.2; gap: 2px; flex-direction: column; }
+    .navBtn i { font-size: 15px; }
+    #app { padding-bottom: 54px; }
     .swatch { width: 32px; height: 32px; }
     #modeToggleBtn { padding: 6px 8px; }
     #controls-row { gap: 6px; }
@@ -378,20 +382,46 @@
     select { min-width: 0; flex: 1 1 80px; }
     #playsSelect { flex: 1 1 100%; order: -1; }
     #planSelector { flex: 1 1 100%; order: -1; }
-    #planTopRow { gap: 6px; }
-    #planTopRow button { padding: 8px 10px; font-size: 11px; }
 
     #mainRow { flex-direction: column; }
     #fieldWrap { flex: 0 0 38vh; min-height: 180px; }
     #infoPanel { flex: 1; min-height: 120px; }
 
-    #planMainRow { flex-direction: column; }
-    #planLeftCol { flex: 1 1 auto; max-width: none; }
-    #planPreviewPanel { display: none; }
+    /* ---- Plan page: real single-page scroll instead of a cramped nested list ---- */
+    #planPage { overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 8px; }
+    #planMobileHeader {
+      align-items: center; justify-content: space-between; gap: 8px;
+      background: var(--surface-med); border-radius: 6px; padding: 10px 12px; margin-bottom: 6px;
+    }
+    #planMobileHeaderName { font-size: 14px; font-weight: 600; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #planSettingsToggleBtn { font-size: 11px; padding: 8px 10px; flex-shrink: 0; }
+    #planTopRowBackdrop { display: none; }
+    #planTopRowBackdrop.open {
+      display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 40;
+    }
+    #planTopRow {
+      display: none; gap: 10px;
+    }
+    #planTopRow.open {
+      display: flex; flex-direction: column; align-items: stretch;
+      position: fixed; top: 8%; left: 5%; right: 5%; max-height: 80vh; overflow-y: auto;
+      z-index: 41; background: #1c1230; box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+      padding: 16px;
+    }
+    #planTopRow.open .timeInfoGroup { flex-wrap: wrap; }
+    #planTopRow button { padding: 10px 12px; font-size: 12px; }
 
-    #planTimeline { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    #planTimeline {
+      position: sticky; top: 0; z-index: 10; overflow-x: auto; -webkit-overflow-scrolling: touch;
+      margin: 0 -8px; border-radius: 0;
+    }
     .timelineSeg { min-width: 78px; flex-shrink: 0; }
     .timelineSeg-minimal { min-width: 34px; }
+
+    #planMainRow { flex-direction: column; flex: none; min-height: 0; }
+    #planLeftCol { flex: none; max-width: none; }
+    #planList { flex: none; overflow-y: visible; }
+    #planPreviewPanel { display: none; }
 
     .planItemLine1 { flex-wrap: wrap; }
     .planItemDetails { display: none; }
@@ -448,6 +478,12 @@
     <div id="settingsSection">
       <h3>Appearance</h3>
       <button id="modeToggleBtn" aria-label="Toggle light/dark mode">☾ Switch to light mode</button>
+    </div>
+    <div id="settingsSection">
+      <h3>Full screen</h3>
+      <p>For the most reliable full-screen experience (no address bar, no browser buttons at all) on an iPad or iPhone: tap Share, then "Add to Home Screen," and open the app from that icon instead of a browser tab. That's the only method that fully hides Safari's UI.</p>
+      <p>If you're on Android Chrome and don't want to install it, this button can hide the browser chrome directly -- it's a genuine fullscreen mode, but note it's less reliable on iPad/iPhone Safari, which restricts this specific feature.</p>
+      <button id="fullscreenToggleBtn">⛶ Go full screen</button>
     </div>
   </div>
   <div id="browsePage" class="hidden">
@@ -533,6 +569,11 @@
   <div id="installNote">Tip: tap Share → "Add to Home Screen" to use this full-screen like an app, offline.</div>
   </div>
   <div id="planPage">
+    <div id="planMobileHeader" class="mobileOnly">
+      <span id="planMobileHeaderName">Practice 1</span>
+      <button id="planSettingsToggleBtn"><i class="ti ti-adjustments" aria-hidden="true"></i>Plan settings</button>
+    </div>
+    <div id="planTopRowBackdrop"></div>
     <div id="planTopRow">
       <label>Plan</label>
       <select id="planSelector"></select>
@@ -1733,6 +1774,7 @@ const STANDARD_PLANS = [
     planPreviewHeader.textContent = 'Tap a row to preview it here';
     planPreviewBody.innerHTML = '';
     planPreviewDiagramWrap.classList.add('hidden');
+    if(typeof closePlanSettingsPopup === 'function') closePlanSettingsPopup();
   }
 
   function renderPlanSelector(){
@@ -1754,6 +1796,7 @@ const STANDARD_PLANS = [
     document.getElementById('deletePlanBtn').classList.toggle('hidden', isStandard);
     document.getElementById('addCustomRow').classList.toggle('hidden', isStandard);
     document.getElementById('planClearBtn').classList.toggle('hidden', isStandard);
+    document.getElementById('planMobileHeaderName').textContent = currentPlan.name;
   }
 
   function formatTime(sec){
@@ -2068,6 +2111,33 @@ const STANDARD_PLANS = [
     if(savedMode) applyMode(savedMode);
   } catch(e){}
 
+  const fullscreenToggleBtn = document.getElementById('fullscreenToggleBtn');
+  fullscreenToggleBtn.addEventListener('click', ()=>{
+    if(!document.fullscreenElement){
+      const req = document.documentElement.requestFullscreen
+        || document.documentElement.webkitRequestFullscreen;
+      if(req){
+        try {
+          const result = req.call(document.documentElement);
+          if(result && typeof result.catch === 'function'){
+            result.catch(()=>{
+              alert('Full screen isn\'t available here -- this is common on iPad/iPhone Safari. Use Share \u2192 Add to Home Screen instead for the reliable version.');
+            });
+          }
+        } catch(e){
+          alert('Full screen isn\'t available here -- this is common on iPad/iPhone Safari. Use Share \u2192 Add to Home Screen instead for the reliable version.');
+        }
+      } else {
+        alert('Full screen isn\'t supported in this browser -- use Share \u2192 Add to Home Screen instead.');
+      }
+    } else {
+      (document.exitFullscreen || document.webkitExitFullscreen || function(){}).call(document);
+    }
+  });
+  document.addEventListener('fullscreenchange', ()=>{
+    fullscreenToggleBtn.textContent = document.fullscreenElement ? '⛶ Exit full screen' : '⛶ Go full screen';
+  });
+
   function buildStaticDiagramSVG(tokensArr, extra){
     extra = extra || {};
     let svg = '<svg viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">';
@@ -2334,6 +2404,17 @@ const STANDARD_PLANS = [
     planQueue.length = 0;
     savePlan(); renderPlanList();
   });
+
+  function openPlanSettingsPopup(){
+    document.getElementById('planTopRow').classList.add('open');
+    document.getElementById('planTopRowBackdrop').classList.add('open');
+  }
+  function closePlanSettingsPopup(){
+    document.getElementById('planTopRow').classList.remove('open');
+    document.getElementById('planTopRowBackdrop').classList.remove('open');
+  }
+  document.getElementById('planSettingsToggleBtn').addEventListener('click', openPlanSettingsPopup);
+  document.getElementById('planTopRowBackdrop').addEventListener('click', closePlanSettingsPopup);
 
   document.getElementById('planSelector').addEventListener('change', (e)=>{
     switchToPlan(e.target.value);
