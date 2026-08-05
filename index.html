@@ -10,6 +10,14 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css">
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  * { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.35) transparent; }
+  *::-webkit-scrollbar { width: 8px; height: 8px; }
+  *::-webkit-scrollbar-track { background: transparent; }
+  *::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.35); border-radius: 8px; }
+  *::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.5); }
+  #app[data-mode="light"] * { scrollbar-color: rgba(0,0,0,0.3) transparent; }
+  #app[data-mode="light"] *::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.3); }
+  #app[data-mode="light"] *::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.45); }
   html, body {
     margin: 0; padding: 0; height: 100%;
     background: #0a0a0a;
@@ -43,8 +51,17 @@
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><path d="M0,0 L10,0 L5,6 Z" fill="%238a8a86"/></svg>');
     background-repeat: no-repeat; background-position: right 10px center;
   }
-  select option { color: #111; background: #fff; }
-  #minAge, #maxAge { flex: 0 1 90px; max-width: 90px; }
+  select option { color: var(--text-primary); background: var(--theme-2); }
+  .filterRow {
+    display: flex; flex-wrap: wrap; gap: 14px 20px; align-items: center;
+    font-size: 12px; color: #8a8a86; text-transform: uppercase; letter-spacing: 0.3px;
+  }
+  .filterPair { display: flex; align-items: center; gap: 10px; flex: 1 1 220px; min-width: 0; }
+  .filterPair label { min-width: 78px; flex-shrink: 0; }
+  .filterPair select { flex: 1 1 auto; min-width: 0; text-transform: none; letter-spacing: normal; }
+  .ageRange { display: flex; align-items: center; gap: 10px; flex: 1 1 auto; min-width: 0; }
+  .ageRange select { flex: 1 1 0; min-width: 0; }
+  #resetFiltersBtn { flex-shrink: 0; margin-left: auto; }
   #playsSelect { flex: 3 1 260px; }
   #browsePage select {
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><path d="M0,0 L10,0 L5,6 Z" fill="%23d8cdf0"/></svg>');
@@ -53,10 +70,14 @@
   #app[data-mode="light"] #browsePage select {
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><path d="M0,0 L10,0 L5,6 Z" fill="%234a3a5a"/></svg>');
   }
-  #categoryFilter, #levelFilter, #diagramFilter { flex: 1 1 140px; }
   #hint { flex: 1; min-width: 180px; text-transform: none; letter-spacing: normal; }
   #mainRow { flex: 1; min-height: 0; display: flex; gap: 10px; }
-  #fieldWrap { flex: 1; min-height: 0; display: flex; background: transparent; }
+  #fieldWrap { flex: 1; min-height: 0; display: flex; background: transparent; position: relative; }
+  #fieldOverlayControls {
+    position: absolute; top: 10px; left: 10px; z-index: 5; display: flex; gap: 8px;
+  }
+  #fieldOverlayControls button { padding: 8px 12px; font-size: 12px; }
+  #fieldSizeBadge { position: absolute; top: 10px; right: 10px; z-index: 5; }
   svg#field { width: 100%; height: 100%; display: block; border-radius: 4px; touch-action: none; }
   #diagramImage {
     max-width: 100%; max-height: 100%; margin: auto;
@@ -84,11 +105,20 @@
   #infoPanelBody h4:first-child { margin-top: 0; }
   #infoPanelBody ul { margin: 0; padding-left: 18px; }
   #infoPanelBody li { margin-bottom: 6px; }
-  .infoPills { display: flex; gap: 6px; margin-bottom: 12px; }
   .infoPill {
     font-size: 12px; padding: 4px 10px; border-radius: 12px;
     background: var(--surface-med); color: var(--text-secondary);
   }
+  .adaptedNote {
+    font-size: 13px; line-height: 1.6; color: #ffe0a8; margin-bottom: 12px;
+    padding: 10px 12px; border-radius: 4px; background: rgba(255,180,50,0.1);
+    border-left: 3px solid #ffb432;
+  }
+  .adaptedNote.akaNote {
+    color: #a8d4ff; background: rgba(50,140,255,0.1); border-left: 3px solid #4fa3ff;
+  }
+  .adaptedNote.akaNote b { color: #7ac0ff; }
+  .adaptedNote b { color: #ffcf7a; }
   #installNote {
     font-size: 12px; color: #6b6b68; text-align: center; padding: 2px 0;
   }
@@ -144,8 +174,8 @@
   #app[data-mode="light"] #customBlockMinutes,
   #app[data-mode="light"] #planTopRow input[type=time] { color: #221a2e; }
   #app[data-mode="light"] svg#field { background: transparent; }
-  #pageNav { display: flex; gap: 8px; align-items: center; }
-  .navBtn { flex: 1; justify-content: center; background: #161616; opacity: 0.55; }
+  #pageNav { display: flex; gap: 8px; align-items: stretch; }
+  .navBtn { flex: 1; justify-content: center; background: #161616; opacity: 0.55; text-align: center; }
   .navBtn.active { background: #1c2b1c; opacity: 1; color: #5fe08a; }
   #settingsPage {
     flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;
@@ -179,6 +209,11 @@
     background: var(--surface-btn); clip-path: none; border-radius: 4px; color: var(--text-primary);
   }
   #browsePage button:active, #planPage button:active { background: var(--surface-btn-active); }
+  .btnGroupGap { width: 14px; flex-shrink: 0; }
+  .btnCaution {
+    border: 1px solid rgba(255,90,90,0.4); background: rgba(255,90,90,0.08); color: #ffb3ac;
+  }
+  .btnCaution:active { background: rgba(255,90,90,0.18); }
   #browsePage select {
     background-color: var(--surface-strong); color: var(--text-primary);
   }
@@ -196,6 +231,7 @@
 
   }
   #planTopRow label { color: var(--text-secondary); }
+  .timeInfoGroup { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
   #planTopRow input[type=time] {
     background: var(--surface-btn); color: var(--text-primary); border: none; padding: 8px 10px; font-size: 13px; border-radius: 4px;
   }
@@ -209,13 +245,15 @@
   }
   .timelineSeg {
     display: flex; flex-direction: row; align-items: center; gap: 6px;
-    font-size: 10px; line-height: 1.3; overflow: hidden;
+    font-size: 10px; line-height: 1.3; overflow: hidden; height: 100%; box-sizing: border-box;
     text-transform: none; letter-spacing: normal; position: relative;
     padding: 4px 6px; border-radius: 3px;
   }
   .timelineSeg .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; background: var(--dot-muted); }
   .timelineSeg.type-break .dot, .timelineSeg.type-custom .dot, .timelineSeg.type-scrimmage .dot { background: #2fd6e0; }
-  .timelineSeg .segLabels { overflow: hidden; min-width: 0; }
+  .timelineSeg .segLabels { overflow: hidden; min-width: 0; display: flex; flex-direction: column; justify-content: center; height: 100%; }
+  .timelineSeg-minimal { justify-content: center; min-width: 40px; }
+  .dropIcon { width: 18px; height: 18px; flex-shrink: 0; }
   .timelineSeg .segName { font-size: 11px; font-weight: 500; color: var(--text-primary); overflow:hidden; text-overflow:ellipsis; white-space: nowrap; }
   .timelineSeg .segTime { color: var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space: nowrap; }
   .timelineSeg.selected { outline: 2px solid #2fd6e0; z-index: 1; }
@@ -232,7 +270,7 @@
   }
   #customBlockMinutes { width: 60px; background: var(--surface-strong); color: var(--text-primary); border: none; padding: 10px; font-size: 13px; text-align: center; border-radius: 4px; }
   #planMainRow { flex: 1; min-height: 0; display: flex; gap: 10px; }
-  #planLeftCol { flex: 0 1 640px; max-width: 640px; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
+  #planLeftCol { flex: 0 1 460px; max-width: 460px; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
   #planList {
     flex: 1; overflow-y: auto; background: var(--panel-bg); border-radius: 8px; padding: 4px 0;
   }
@@ -242,22 +280,21 @@
   }
   .planItem {
     display: block; cursor: pointer;
-    padding: 0 14px; border-bottom: 1px solid var(--surface-weak);
+    padding: 8px 14px; border-bottom: 1px solid var(--surface-weak);
   }
   .planItem:hover { background: var(--surface-hover); }
-  .planItemSummary { display: flex; align-items: center; gap: 8px; padding: 9px 0; }
+  .planItemLine1 { display: flex; align-items: center; gap: 8px; }
+  .planItemLine2 { display: flex; align-items: center; gap: 10px; margin-top: 4px; padding-left: 18px; }
   .planItemChevron { font-size: 11px; color: var(--text-mutedmore); flex-shrink: 0; width: 10px; }
   .planItem .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; background: var(--dot-muted); }
   .planItem.type-break .dot, .planItem.type-custom .dot, .planItem.type-scrimmage .dot { background: #2fd6e0; }
-  .planItem.selected, .planItem.current { background: rgba(47,214,224,0.14); }
+  .planItem.selected, .planItem.current { background: rgba(47,214,224,0.18); border-left: 3px solid #2fd6e0; }
   .planItem.current .dot { background: #2fd6e0; box-shadow: 0 0 4px #2fd6e0; }
-  .planItem.expanded { background: var(--surface-hover); }
-  .planItemDetails {
-    display: flex; flex-direction: column; gap: 12px;
-    padding: 0 0 14px 18px; cursor: default;
+  @media (min-width: 701px) {
+    .planItemChevron { display: none; }
   }
-  .planItemDetailsControls { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-  .planItemDurRow { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); }
+  .planItem.expanded { background: var(--surface-hover); }
+  .planItemDetails { padding: 12px 0 4px 18px; cursor: default; }
   .planItemPreviewInline { display: flex; flex-direction: column; gap: 10px; max-width: 480px; }
   .planItemPreviewInline svg, .planItemPreviewInline img { width: 100%; max-height: 220px; object-fit: contain; border-radius: 4px; }
   .planItemPreviewInline img { background: #ffffff; }
@@ -271,9 +308,10 @@
     font-size: 9px; text-transform: uppercase; letter-spacing: 0.3px; padding: 2px 5px;
     border-radius: 3px; flex-shrink: 0; background: var(--surface-strong); color: var(--text-secondary);
   }
-  .planItemName { flex: 0 1 auto; max-width: 260px; font-size: 13px; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .planItemSplit { font-size: 10px; color: var(--text-mutedmore); flex-shrink: 0; }
-  .planItemClock { font-size: 11px; color: var(--text-muted); min-width: 92px; text-align: right; flex-shrink: 0; }
+  .planItemName { flex: 1 1 auto; min-width: 0; font-size: 13px; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .planItemSplit { font-size: 10px; color: var(--text-mutedmore); }
+  .planItemClock { font-size: 11px; color: var(--text-muted); }
+  .planItemDurStatic { font-size: 12px; color: var(--text-muted); flex-shrink: 0; }
   .planItem input[type=number] {
     width: 46px; background: rgba(0,0,0,0.3); color: #fff; border: none; border-radius: 3px;
     padding: 4px; font-size: 12px; text-align: center; flex-shrink: 0;
@@ -300,8 +338,15 @@
     padding: 14px 16px; border-bottom: 1px solid var(--surface-med); font-size: 13px; color: var(--text-muted);
     text-transform: none; letter-spacing: normal;
   }
-  #planPreviewBody { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
-  #planPreviewBody svg, #planPreviewBody img { width: 100%; max-height: 260px; object-fit: contain; border-radius: 4px; }
+  #planPreviewDiagramWrap {
+    flex: 0 1 340px; min-height: 140px; padding: 14px 16px 0; position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #previewPlayBtn { position: absolute; top: 22px; left: 22px; z-index: 5; padding: 8px 12px; font-size: 12px; }
+  #planPreviewSizeBadge { position: absolute; top: 22px; right: 22px; z-index: 5; }
+  #previewField { width: 100%; height: 100%; max-height: 100%; display: block; border-radius: 4px; }
+  #planPreviewBody { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+  #planPreviewBody svg, #planPreviewBody img { width: 100%; max-height: 340px; object-fit: contain; border-radius: 4px; }
   #planPreviewBody img { background: #ffffff; }
   #planPreviewBody h4 {
     font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px;
@@ -311,6 +356,9 @@
   #planPreviewBody ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.6; color: var(--text-body); }
 
   .mobileOnly { display: none; }
+  @media (min-width: 701px) {
+    .planItemPreviewInline { display: none; }
+  }
   @media (max-width: 700px) {
     #app { padding: 6px; gap: 4px; }
     #pageNav {
@@ -318,12 +366,11 @@
       background: #0a0a0a; padding: 8px; margin: 0; gap: 8px;
       box-shadow: 0 -2px 8px rgba(0,0,0,0.4);
     }
+    .navBtn { font-size: 11px; padding: 10px 4px; line-height: 1.3; }
     #app { padding-bottom: 64px; }
     .swatch { width: 32px; height: 32px; }
     #modeToggleBtn { padding: 6px 8px; }
     #controls-row { gap: 6px; }
-    input[type=range] { width: 60px; }
-    #speedOut { display: none; }
     #playBtn, #addToPlanBtn { padding: 8px 10px; font-size: 12px; }
     .mobileOnly { display: flex; }
     #filterRows { display: none; }
@@ -344,10 +391,12 @@
 
     #planTimeline { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .timelineSeg { min-width: 78px; flex-shrink: 0; }
+    .timelineSeg-minimal { min-width: 34px; }
 
-    .planItemSummary { flex-wrap: wrap; }
-    .planItemName { max-width: none; flex: 1 1 100%; order: -1; margin-bottom: 2px; margin-left: 18px; }
-    .planItemClock { min-width: 0; }
+    .planItemLine1 { flex-wrap: wrap; }
+    .planItemDetails { display: none; }
+    .planItem.expanded .planItemDetails { display: block; }
+    .planItemName { flex: 1 1 100%; order: -1; margin-bottom: 4px; }
 
     #addCustomRow { flex-wrap: wrap; }
     #customBlockName { flex: 1 1 100%; }
@@ -358,14 +407,15 @@
 <body>
 <div id="app" data-theme="purple" data-mode="dark">
   <div id="pageNav">
-    <button id="navPlanBtn" class="navBtn"><i class="ti ti-calendar-time" aria-hidden="true"></i>Plan practice</button>
-    <button id="navBrowseBtn" class="navBtn active"><i class="ti ti-list" aria-hidden="true"></i>Browse drills</button>
-    <button id="navSettingsBtn" class="navBtn"><i class="ti ti-settings" aria-hidden="true"></i>Settings</button>
+    <button id="navPlanBtn" class="navBtn active"><i class="ti ti-calendar-time" aria-hidden="true"></i>Plan practice</button>
+    <button id="navBrowseBtn" class="navBtn"><i class="ti ti-list" aria-hidden="true"></i>Browse drills</button>
+    <button id="navSettingsBtn" class="navBtn"><i class="ti ti-info-circle" aria-hidden="true"></i>Info</button>
   </div>
   <div id="settingsPage" class="hidden">
     <div id="settingsSection">
       <h3>About this app</h3>
       <p>This board loads real soccer drills from a Supabase database (sourced from PlayMetrics) and helps you plan and run practices for young players. There are 290 drills total; 22 are tagged specifically for this team's age group, and 16 of those actually scale down to a 6-player team.</p>
+      <p>One thing worth knowing: <b>Hungry, Hungry Hippos</b> and <b>Boston Bulldogs</b> are the same drill as <b>Crocs in the River</b> -- same grid, same "cross without being caught" mechanic, just different costumes. The 8 standard practices only use Crocs in the River for that game, so it isn't accidentally repeated under three different names.</p>
     </div>
     <div id="settingsSection">
       <h3>How to use it</h3>
@@ -393,44 +443,49 @@
       <button id="modeToggleBtn" aria-label="Toggle light/dark mode">☾ Switch to light mode</button>
     </div>
   </div>
-  <div id="browsePage">
-  <div id="controls-row">
-    <button id="playBtn"><i class="ti ti-player-play-filled" aria-hidden="true"></i>Play</button>
-    <label>Speed</label>
-    <input type="range" id="speed" min="0.5" max="2" step="0.1" value="1">
-    <span id="speedOut">1.0x</span>
-    <span style="flex:1"></span>
-    <button id="addToPlanBtn"><i class="ti ti-playlist-add" aria-hidden="true"></i>Add to plan</button>
-  </div>
+  <div id="browsePage" class="hidden">
   <div id="controls-row">
     <label>Plays</label>
     <select id="playsSelect"></select>
+    <button id="addToPlanBtn"><i class="ti ti-playlist-add" aria-hidden="true"></i>Add to plan</button>
     <button id="filtersToggleBtn" class="mobileOnly"><i class="ti ti-filter" aria-hidden="true"></i>Filters</button>
   </div>
   <div id="filterRows">
-    <div id="controls-row">
-      <label>Age</label>
-      <select id="minAge"><option value="">Min</option></select>
-      <span>to</span>
-      <select id="maxAge"><option value="">Max</option></select>
-    </div>
-    <div id="controls-row">
-      <label>Category</label>
-      <select id="categoryFilter"><option value="">All</option></select>
-      <label>Level cap</label>
-      <select id="levelFilter"><option value="">All</option></select>
-      <label>Diagram</label>
-      <select id="diagramFilter">
-        <option value="">All</option>
-        <option value="animated">Animated</option>
-        <option value="image">Image</option>
-        <option value="text">Text only</option>
-      </select>
+    <div class="filterRow">
+      <div class="filterPair">
+        <label>Age</label>
+        <div class="ageRange">
+          <select id="minAge"><option value="">Min</option></select>
+          <span>to</span>
+          <select id="maxAge"><option value="">Max</option></select>
+        </div>
+      </div>
+      <div class="filterPair">
+        <label>Category</label>
+        <select id="categoryFilter"><option value="">All</option></select>
+      </div>
+      <div class="filterPair">
+        <label>Level cap</label>
+        <select id="levelFilter"><option value="">All</option></select>
+      </div>
+      <div class="filterPair">
+        <label>Diagram</label>
+        <select id="diagramFilter">
+          <option value="">All</option>
+          <option value="animated">Animated</option>
+          <option value="image">Image</option>
+          <option value="text">Text only</option>
+        </select>
+      </div>
       <button id="resetFiltersBtn"><i class="ti ti-filter-off" aria-hidden="true"></i>Reset filters</button>
     </div>
   </div>
   <div id="mainRow">
     <div id="fieldWrap">
+      <div id="fieldOverlayControls">
+        <button id="playBtn"><i class="ti ti-player-play-filled" aria-hidden="true"></i>Play</button>
+      </div>
+      <div id="fieldSizeBadge" class="infoPill hidden"></div>
       <svg id="field" viewBox="0 0 680 440">
         <defs>
           <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
@@ -470,21 +525,22 @@
   </div>
   <div id="installNote">Tip: tap Share → "Add to Home Screen" to use this full-screen like an app, offline.</div>
   </div>
-  <div id="planPage" class="hidden">
+  <div id="planPage">
     <div id="planTopRow">
       <label>Plan</label>
       <select id="planSelector"></select>
       <button id="newPlanBtn"><i class="ti ti-plus" aria-hidden="true"></i>New plan</button>
-      <button id="resetStandardBtn" class="hidden"><i class="ti ti-wand" aria-hidden="true"></i>Reset to standard</button>
+      <span class="btnGroupGap"></span>
+      <button id="duplicatePlanBtn"><i class="ti ti-copy" aria-hidden="true"></i>Duplicate as new plan</button>
       <button id="renamePlanBtn" class="hidden"><i class="ti ti-pencil" aria-hidden="true"></i>Rename</button>
-      <button id="deletePlanBtn" class="hidden"><i class="ti ti-trash" aria-hidden="true"></i>Delete plan</button>
-    </div>
-    <div id="planTopRow">
-      <label>Start time</label>
-      <input type="time" id="startTimeInput" value="17:30">
-      <span id="planTotalsText"></span>
+      <button id="deletePlanBtn" class="hidden btnCaution"><i class="ti ti-trash" aria-hidden="true"></i>Delete plan</button>
       <span style="flex:1"></span>
-      <button id="planClearBtn"><i class="ti ti-trash" aria-hidden="true"></i>Clear plan</button>
+      <div class="timeInfoGroup">
+        <label>Start time</label>
+        <input type="time" id="startTimeInput" value="17:30">
+        <span id="planTotalsText"></span>
+      </div>
+      <button id="planClearBtn" class="btnCaution"><i class="ti ti-trash" aria-hidden="true"></i>Clear plan</button>
     </div>
     <div id="planSeedWarning" class="hidden"></div>
     <div id="planTimeline"></div>
@@ -517,6 +573,32 @@
       </div>
       <div id="planPreviewPanel">
         <div id="planPreviewHeader">Tap a row to preview it here</div>
+        <div id="planPreviewDiagramWrap" class="hidden">
+          <button id="previewPlayBtn"><i class="ti ti-player-play-filled" aria-hidden="true"></i>Play</button>
+          <div id="planPreviewSizeBadge" class="infoPill hidden"></div>
+          <svg id="previewField" viewBox="0 0 680 440">
+            <defs>
+              <marker id="previewArrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill="#5fe08a"></path>
+              </marker>
+            </defs>
+            <g>
+              <rect x="0" y="0" width="680" height="440" fill="#0f2e1a"></rect>
+              <rect x="80" y="0" width="80" height="440" fill="#123822"></rect>
+              <rect x="240" y="0" width="80" height="440" fill="#123822"></rect>
+              <rect x="400" y="0" width="80" height="440" fill="#123822"></rect>
+              <rect x="560" y="0" width="80" height="440" fill="#123822"></rect>
+            </g>
+            <g stroke="#ffffff" stroke-width="1.5" fill="none" opacity="0.55">
+              <rect x="20" y="20" width="640" height="400"></rect>
+              <line x1="340" y1="20" x2="340" y2="420"></line>
+              <circle cx="340" cy="220" r="50"></circle>
+              <circle cx="340" cy="220" r="2.5" fill="#ffffff"></circle>
+            </g>
+            <g id="previewPathsLayer"></g>
+            <g id="previewTokensLayer"></g>
+          </svg>
+        </div>
         <div id="planPreviewBody"></div>
       </div>
     </div>
@@ -597,6 +679,7 @@
   ];
   const svg = document.getElementById('field');
   const diagramImage = document.getElementById('diagramImage');
+  const fieldSizeBadge = document.getElementById('fieldSizeBadge');
   const pathsLayer = document.getElementById('pathsLayer');
   const tokensLayer = document.getElementById('tokensLayer');
   let tokens = [];
@@ -616,18 +699,21 @@
     if(!val){
       infoPanelTitle.textContent = '';
       infoPanelBody.innerHTML = '<p>Nothing selected.</p>';
+      fieldSizeBadge.classList.add('hidden');
       return;
     }
     const [type, idxStr] = val.split(':');
     if(type !== 'db'){
       infoPanelTitle.textContent = 'No coaching text';
       infoPanelBody.innerHTML = '<p>Built-in examples don\'t have written instructions attached — only drills from your library do.</p>';
+      fieldSizeBadge.classList.add('hidden');
       return;
     }
     const drill = dbDrills.find(d => String(d.id) === String(idxStr));
     if(!drill){
       infoPanelTitle.textContent = '';
       infoPanelBody.innerHTML = '<p>Nothing selected.</p>';
+      fieldSizeBadge.classList.add('hidden');
       return;
     }
     const d = drill.data || {};
@@ -636,23 +722,22 @@
     const hasImage = !!d.diagram_image_url;
     const instr = d.instructions ? d.instructions.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : 'No instructions recorded.';
     let html = '';
-    const pills = [];
-    if(d.duration_total_mins) pills.push(d.duration_total_mins + ' min');
-    if(d.field_width && d.field_length) pills.push(d.field_width + ' x ' + d.field_length);
-    if(pills.length) html += '<div class="infoPills">' + pills.map(p=>'<span class="infoPill">'+p+'</span>').join('') + '</div>';
+    if(d.field_width && d.field_length){
+      fieldSizeBadge.textContent = d.field_width + ' x ' + d.field_length;
+      fieldSizeBadge.classList.remove('hidden');
+    } else {
+      fieldSizeBadge.classList.add('hidden');
+    }
     if(!hasDiagram && hasImage) html += '<p style="color:#8a8a86;">Showing the original diagram image — not animated, but the real thing.</p>';
     if(!hasDiagram && !hasImage) html += '<p style="color:#8a8a86;">No diagram available yet for this one — text only.</p>';
+    if(d.aka_note) html += '<div class="adaptedNote akaNote"><b>Also known as:</b> ' + d.aka_note.replace(/^Also known as:\s*/, '') + '</div>';
+    if(d.adapted_note) html += '<div class="adaptedNote"><b>Adapted for our team:</b> ' + d.adapted_note + '</div>';
     html += '<h4>Instructions</h4><p>' + instr + '</p>';
     if(Array.isArray(d.coaching_points) && d.coaching_points.length){
       html += '<h4>Coaching points</h4><ul>' + d.coaching_points.map(p=>'<li>'+p+'</li>').join('') + '</ul>';
     }
     infoPanelBody.innerHTML = html;
   }
-
-  document.getElementById('speed').addEventListener('input', (e)=>{
-    speed = parseFloat(e.target.value);
-    document.getElementById('speedOut').textContent = speed.toFixed(1)+'x';
-  });
 
   function loadSetup(setupTokens, extra){
     tokens = []; paths = {};
@@ -901,36 +986,36 @@
     requestAnimationFrame(frame);
   });
 
-  function render(){
-    pathsLayer.innerHTML = '';
-    tokensLayer.innerHTML = '';
+  function renderField(tokensArr, pathsObj, zoneBoxesArr, zoneLinesArr, connectorsArr, pathsLayerEl, tokensLayerEl, arrowId){
+    pathsLayerEl.innerHTML = '';
+    tokensLayerEl.innerHTML = '';
 
-    zoneBoxes.forEach(zb=>{
+    (zoneBoxesArr||[]).forEach(zb=>{
       const r = document.createElementNS('http://www.w3.org/2000/svg','rect');
       r.setAttribute('x', zb.x); r.setAttribute('y', zb.y);
       r.setAttribute('width', zb.w); r.setAttribute('height', zb.h);
       r.setAttribute('fill', 'none'); r.setAttribute('stroke', '#5fe08a');
       r.setAttribute('stroke-width', '2');
-      pathsLayer.appendChild(r);
+      pathsLayerEl.appendChild(r);
     });
-    zoneLines.forEach(zl=>{
+    (zoneLinesArr||[]).forEach(zl=>{
       const l = document.createElementNS('http://www.w3.org/2000/svg','line');
       l.setAttribute('x1', zl.x1); l.setAttribute('y1', zl.y1);
       l.setAttribute('x2', zl.x2); l.setAttribute('y2', zl.y2);
       l.setAttribute('stroke', '#5fe08a'); l.setAttribute('stroke-width', '1.5');
       l.setAttribute('stroke-dasharray', '3,3');
-      pathsLayer.appendChild(l);
+      pathsLayerEl.appendChild(l);
     });
-    connectors.forEach(cn=>{
+    (connectorsArr||[]).forEach(cn=>{
       const l = document.createElementNS('http://www.w3.org/2000/svg','line');
       l.setAttribute('x1', cn.x1); l.setAttribute('y1', cn.y1);
       l.setAttribute('x2', cn.x2); l.setAttribute('y2', cn.y2);
       l.setAttribute('stroke', '#c8ff5c'); l.setAttribute('stroke-width', '2.5');
-      pathsLayer.appendChild(l);
+      pathsLayerEl.appendChild(l);
     });
 
-    Object.keys(paths).forEach(id=>{
-      const pdata = paths[id];
+    Object.keys(pathsObj).forEach(id=>{
+      const pdata = pathsObj[id];
       if(!pdata.pts.length) return;
       let d = 'M'+pdata.origin.x+','+pdata.origin.y;
       pdata.pts.forEach(p=>{ d += ' L'+p.x+','+p.y; });
@@ -940,13 +1025,13 @@
       el.setAttribute('stroke', '#5fe08a');
       el.setAttribute('stroke-width', '2');
       el.setAttribute('stroke-dasharray', '6,5');
-      el.setAttribute('marker-end', 'url(#arrow)');
-      pathsLayer.appendChild(el);
+      el.setAttribute('marker-end', 'url(#'+arrowId+')');
+      pathsLayerEl.appendChild(el);
     });
     // draw order matters: balls and cones first (bottom), players/coach/opponents last (top)
     // so a ball sitting on a player's exact position never hides that player's number.
     const drawOrder = {cone:0, ball:1, b:2, coach:2, a:3};
-    const sortedTokens = tokens.slice().sort((x,y)=>(drawOrder[x.kind]??2)-(drawOrder[y.kind]??2));
+    const sortedTokens = tokensArr.slice().sort((x,y)=>(drawOrder[x.kind]??2)-(drawOrder[y.kind]??2));
     sortedTokens.forEach(t=>{
       const g = document.createElementNS('http://www.w3.org/2000/svg','g');
       g.setAttribute('data-token-id', t.id);
@@ -997,9 +1082,88 @@
         txt.textContent = t.num;
         g.appendChild(txt);
       }
-      tokensLayer.appendChild(g);
+      tokensLayerEl.appendChild(g);
     });
   }
+  function render(){
+    renderField(tokens, paths, zoneBoxes, zoneLines, connectors, pathsLayer, tokensLayer, 'arrow');
+  }
+
+  // ---- Preview panel's own independent animated field (Plan page) ----
+  const previewField = document.getElementById('previewField');
+  const previewPathsLayer = document.getElementById('previewPathsLayer');
+  const previewTokensLayer = document.getElementById('previewTokensLayer');
+  const planPreviewDiagramWrap = document.getElementById('planPreviewDiagramWrap');
+  const planPreviewSizeBadge = document.getElementById('planPreviewSizeBadge');
+  let previewTokens = [];
+  let previewPaths = {};
+  let previewPlaying = false;
+  let previewSpeed = 1;
+  let previewZoneBoxes = [], previewZoneLines = [], previewConnectors = [];
+
+  function renderPreviewField(){
+    renderField(previewTokens, previewPaths, previewZoneBoxes, previewZoneLines, previewConnectors, previewPathsLayer, previewTokensLayer, 'previewArrow');
+  }
+
+  function loadPreviewSetup(setupTokens, extra){
+    previewTokens = []; previewPaths = {};
+    let countA = 0, countB = 0;
+    previewZoneBoxes = (extra && extra.zoneBoxes) || [];
+    previewZoneLines = (extra && extra.zoneLines) || [];
+    previewConnectors = (extra && extra.connectors) || [];
+    setupTokens.forEach(t=>{
+      const id = 'pv'+Date.now()+Math.floor(Math.random()*100000);
+      let num = null;
+      if(t.kind==='a'){ countA++; num=countA; }
+      if(t.kind==='b'){ countB++; num=countB; }
+      previewTokens.push({id, kind:t.kind, x:t.x, y:t.y, num});
+      if(t.path && t.path.length){
+        previewPaths[id] = {origin:{x:t.x,y:t.y}, pts: t.path.map(p=>({x:p.x,y:p.y}))};
+      }
+    });
+    renderPreviewField();
+  }
+
+  document.getElementById('previewPlayBtn').addEventListener('click', ()=>{
+    if(previewPlaying) return;
+    const animTokens = previewTokens.filter(t=>previewPaths[t.id] && previewPaths[t.id].pts.length).map(t=>({
+      id:t.id, points:[{x:previewPaths[t.id].origin.x,y:previewPaths[t.id].origin.y}, ...previewPaths[t.id].pts]
+    }));
+    if(!animTokens.length) return;
+    previewPlaying = true;
+    const duration = 2600/previewSpeed;
+    let startTime = null;
+    const safetyTimer = setTimeout(()=>{ previewPlaying = false; }, duration + 5000);
+    function frame(now){
+      try {
+        if(startTime === null) startTime = now;
+        const elapsed = now-startTime;
+        let allDone = true;
+        for(const at of animTokens){
+          const segs = at.points.length-1;
+          const t = Math.min(elapsed/duration,1);
+          if(t<1) allDone=false;
+          const scaledT = t*segs;
+          const segIdx = Math.min(Math.floor(scaledT), segs-1);
+          const localT = scaledT-segIdx;
+          const p0 = at.points[segIdx], p1 = at.points[segIdx+1];
+          const x = p0.x+(p1.x-p0.x)*localT;
+          const y = p0.y+(p1.y-p0.y)*localT;
+          const tok = previewTokens.find(tt=>tt.id===at.id);
+          if(tok){ tok.x=x; tok.y=y; }
+        }
+        renderPreviewField();
+        if(!allDone) requestAnimationFrame(frame);
+        else{ previewPlaying=false; clearTimeout(safetyTimer); }
+      } catch(err){
+        console.warn('Preview animation frame error, stopping playback:', err);
+        previewPlaying = false;
+        clearTimeout(safetyTimer);
+      }
+    }
+    requestAnimationFrame(frame);
+  });
+
   // ---- Practice plan builder ----
   const planList = document.getElementById('planList');
   const planSession = document.getElementById('planSession');
@@ -1140,7 +1304,7 @@ const STANDARD_PLANS = [
         "type": "drill"
       },
       {
-        "name": "Boston Bulldogs",
+        "name": "Crocs in the River",
         "minutes": 7,
         "type": "drill"
       },
@@ -1152,12 +1316,12 @@ const STANDARD_PLANS = [
         "note": "August evening heat + young kids -- keep this non-negotiable."
       },
       {
-        "name": "Hungry, Hungry Hippos",
+        "name": "4 Surfaces Dribbling",
         "minutes": 7,
         "type": "drill"
       },
       {
-        "name": "4 Surfaces Dribbling",
+        "name": "Police Patrol",
         "minutes": 7,
         "type": "drill"
       },
@@ -1199,7 +1363,7 @@ const STANDARD_PLANS = [
         "type": "drill"
       },
       {
-        "name": "Police Patrol",
+        "name": "Crushing Monster Trucks",
         "minutes": 7,
         "type": "drill"
       },
@@ -1211,12 +1375,12 @@ const STANDARD_PLANS = [
         "note": "August evening heat + young kids -- keep this non-negotiable."
       },
       {
-        "name": "Crushing Monster Trucks",
+        "name": "Driving Through Moving Tunnel",
         "minutes": 7,
         "type": "drill"
       },
       {
-        "name": "Driving Through Moving Tunnel",
+        "name": "Through the Gate",
         "minutes": 7,
         "type": "drill"
       },
@@ -1258,7 +1422,7 @@ const STANDARD_PLANS = [
         "type": "drill"
       },
       {
-        "name": "Through the Gate",
+        "name": "3 Dribbling Stations",
         "minutes": 7,
         "type": "drill"
       },
@@ -1270,12 +1434,12 @@ const STANDARD_PLANS = [
         "note": "August evening heat + young kids -- keep this non-negotiable."
       },
       {
-        "name": "3 Dribbling Stations",
+        "name": "Pirates of the Caribbean",
         "minutes": 7,
         "type": "drill"
       },
       {
-        "name": "2 Headed Monster Invasion",
+        "name": "Sailing the Seas",
         "minutes": 7,
         "type": "drill"
       },
@@ -1317,7 +1481,7 @@ const STANDARD_PLANS = [
         "type": "drill"
       },
       {
-        "name": "Saber Tooth Squirrels (Scrat) Acorn Hunt",
+        "name": "Wreck it Ralph",
         "minutes": 7,
         "type": "drill"
       },
@@ -1329,12 +1493,12 @@ const STANDARD_PLANS = [
         "note": "August evening heat + young kids -- keep this non-negotiable."
       },
       {
-        "name": "Steal the Treasure",
+        "name": "Field of Doom",
         "minutes": 7,
         "type": "drill"
       },
       {
-        "name": "4 Surfaces Dribbling to 4 Goals",
+        "name": "6 Surfaces Dribbling",
         "minutes": 7,
         "type": "drill"
       },
@@ -1376,7 +1540,7 @@ const STANDARD_PLANS = [
         "type": "drill"
       },
       {
-        "name": "Sid the Sloth vs Crash & Eddy",
+        "name": "Freeze Tag",
         "minutes": 7,
         "type": "drill"
       },
@@ -1388,12 +1552,12 @@ const STANDARD_PLANS = [
         "note": "August evening heat + young kids -- keep this non-negotiable."
       },
       {
-        "name": "Bulldogs Hunting for Milk-Bones",
+        "name": "1v1 Dribbling Challenge",
         "minutes": 7,
         "type": "drill"
       },
       {
-        "name": "Boston Bulldogs",
+        "name": "The Cat in the Hat vs Things 1 & 2",
         "minutes": 7,
         "type": "drill"
       },
@@ -1435,7 +1599,7 @@ const STANDARD_PLANS = [
         "type": "drill"
       },
       {
-        "name": "Hungry, Hungry Hippos",
+        "name": "Triangle Gate Challenge",
         "minutes": 7,
         "type": "drill"
       },
@@ -1447,12 +1611,12 @@ const STANDARD_PLANS = [
         "note": "August evening heat + young kids -- keep this non-negotiable."
       },
       {
-        "name": "4 Surfaces Dribbling",
+        "name": "Triangle gate Challenge with Guards",
         "minutes": 7,
         "type": "drill"
       },
       {
-        "name": "Police Patrol",
+        "name": "2 Headed Monster Invasion",
         "minutes": 7,
         "type": "drill"
       },
@@ -1486,36 +1650,41 @@ const STANDARD_PLANS = [
   }
 ];
 
-  function loadSavedPlans(){
-    try {
-      const raw = localStorage.getItem('soccerBoardPlans');
-      const parsed = raw ? JSON.parse(raw) : {};
-      // Make sure all 8 standard plans exist. Never overwrite a standard plan
-      // that's already saved (that's the user's edited version) -- only add
-      // ones that are missing (first run, or a plan that got deleted).
-      STANDARD_PLANS.forEach(sp=>{
-        if(!parsed[sp.id]){
-          parsed[sp.id] = { id: sp.id, name: sp.name, items: JSON.parse(JSON.stringify(sp.items)), isStandard: true };
-        }
-      });
-      return parsed;
-    } catch(e){
-      const fresh = {};
-      STANDARD_PLANS.forEach(sp=>{
-        fresh[sp.id] = { id: sp.id, name: sp.name, items: JSON.parse(JSON.stringify(sp.items)), isStandard: true };
-      });
-      return fresh;
-    }
+  // Standard plans are never stored in localStorage and never mutated --
+  // they're always read fresh from STANDARD_PLANS. Only custom (user-created)
+  // plans get persisted. This is deliberate: editing a standard plan's rows
+  // (if that ever becomes possible again) should never silently "stick" and
+  // then look stale forever -- if you want a customized version of a
+  // standard practice, duplicate it into a real custom plan instead.
+  function freshStandardPlan(sp){
+    return { id: sp.id, name: sp.name, items: JSON.parse(JSON.stringify(sp.items)), isStandard: true };
   }
 
-  let savedPlans = loadSavedPlans();
+  function loadCustomPlans(){
+    try {
+      const raw = localStorage.getItem('soccerBoardCustomPlans');
+      return raw ? JSON.parse(raw) : {};
+    } catch(e){ return {}; }
+  }
+
+  let customPlans = loadCustomPlans();
   let currentPlanId = 'standard1';
   try {
     const savedCurrent = localStorage.getItem('soccerBoardCurrentPlanId');
-    if(savedCurrent && savedPlans[savedCurrent]) currentPlanId = savedCurrent;
+    if(savedCurrent && (savedCurrent.indexOf('standard')===0 || customPlans[savedCurrent])) currentPlanId = savedCurrent;
   } catch(e){}
 
-  let planQueue = savedPlans[currentPlanId].items;
+  function getPlan(id){
+    if(id && id.indexOf('standard')===0){
+      const sp = STANDARD_PLANS.find(p=>p.id===id);
+      return sp ? freshStandardPlan(sp) : null;
+    }
+    return customPlans[id] || null;
+  }
+
+  let currentPlan = getPlan(currentPlanId) || freshStandardPlan(STANDARD_PLANS[0]);
+  if(!getPlan(currentPlanId)) currentPlanId = 'standard1';
+  let planQueue = currentPlan.items;
 
   try {
     const savedStart = localStorage.getItem('practiceStartTime');
@@ -1524,12 +1693,15 @@ const STANDARD_PLANS = [
 
   let session = { running:false, paused:false, index:-1, remaining:0, intervalId:null, startedAt:null, plannedTotalSec:0 };
 
-  function savePlans(){
-    try { localStorage.setItem('soccerBoardPlans', JSON.stringify(savedPlans)); } catch(e){}
+  function saveCustomPlans(){
+    try { localStorage.setItem('soccerBoardCustomPlans', JSON.stringify(customPlans)); } catch(e){}
   }
-  // kept as an alias so all the existing call sites (which say savePlan())
-  // don't need touching -- it just persists the whole plan collection now.
-  function savePlan(){ savePlans(); }
+  // kept as an alias so existing call sites (savePlan()) don't need touching --
+  // it only ever persists custom plans; standard plans are never written.
+  function savePlan(){
+    if(!currentPlan.isStandard) saveCustomPlans();
+  }
+  function savePlans(){ savePlan(); }
 
   function resolveDrill(item){
     if(item.id != null){
@@ -1540,10 +1712,12 @@ const STANDARD_PLANS = [
   }
 
   function switchToPlan(planId){
-    if(!savedPlans[planId]) return;
+    const plan = getPlan(planId);
+    if(!plan) return;
     if(session.running) stopSession();
     currentPlanId = planId;
-    planQueue = savedPlans[planId].items;
+    currentPlan = plan;
+    planQueue = plan.items;
     selectedPlanIndex = -1;
     expandedRows.clear();
     try { localStorage.setItem('soccerBoardCurrentPlanId', planId); } catch(e){}
@@ -1551,6 +1725,7 @@ const STANDARD_PLANS = [
     renderPlanList();
     planPreviewHeader.textContent = 'Tap a row to preview it here';
     planPreviewBody.innerHTML = '';
+    planPreviewDiagramWrap.classList.add('hidden');
   }
 
   function renderPlanSelector(){
@@ -1558,20 +1733,20 @@ const STANDARD_PLANS = [
     sel.innerHTML = '';
     STANDARD_PLANS.forEach(sp=>{
       const o = document.createElement('option');
-      o.value = sp.id; o.textContent = savedPlans[sp.id].name;
+      o.value = sp.id; o.textContent = sp.name;
       sel.appendChild(o);
     });
-    Object.keys(savedPlans).filter(id => !savedPlans[id].isStandard).forEach(id=>{
+    Object.keys(customPlans).forEach(id=>{
       const o = document.createElement('option');
-      o.value = id; o.textContent = savedPlans[id].name;
+      o.value = id; o.textContent = customPlans[id].name;
       sel.appendChild(o);
     });
     sel.value = currentPlanId;
-    const isStandard = savedPlans[currentPlanId].isStandard;
-    document.getElementById('resetStandardBtn').classList.toggle('hidden', !isStandard);
+    const isStandard = currentPlan.isStandard;
     document.getElementById('renamePlanBtn').classList.toggle('hidden', isStandard);
     document.getElementById('deletePlanBtn').classList.toggle('hidden', isStandard);
     document.getElementById('addCustomRow').classList.toggle('hidden', isStandard);
+    document.getElementById('planClearBtn').classList.toggle('hidden', isStandard);
   }
 
   function formatTime(sec){
@@ -1635,21 +1810,29 @@ const STANDARD_PLANS = [
         renderPlanList();
         renderPlanPreview(seg.item);
       });
-      const segClock = new Date(startTime.getTime() + seg.startSec*1000);
-      const dot = document.createElement('div');
-      dot.className = 'dot';
-      div.appendChild(dot);
-      const labels = document.createElement('div');
-      labels.className = 'segLabels';
-      const nameEl = document.createElement('div');
-      nameEl.className = 'segName';
-      nameEl.textContent = seg.item.name;
-      const timeEl = document.createElement('div');
-      timeEl.className = 'segTime';
-      timeEl.textContent = formatClock(segClock) + ' \u00b7 ' + seg.item.minutes + 'm' +
-        (type==='drill' && seg.item.minutes > 2 ? ' (2t+' + (seg.item.minutes-2) + 'p)' : '');
-      labels.appendChild(nameEl); labels.appendChild(timeEl);
-      div.appendChild(labels);
+      if(type === 'break'){
+        // The list view below already shows the name/time for breaks --
+        // on the timeline itself, a plain water-drop icon is enough,
+        // rather than repeating text that won't fit well anyway.
+        div.classList.add('timelineSeg-minimal');
+        div.innerHTML = '<svg viewBox="0 0 24 24" class="dropIcon"><path d="M12 2 C12 2 5 11 5 15.5 C5 19.5 8.5 22 12 22 C15.5 22 19 19.5 19 15.5 C19 11 12 2 12 2 Z" fill="#2fd6e0"/></svg>';
+      } else {
+        const segClock = new Date(startTime.getTime() + seg.startSec*1000);
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        div.appendChild(dot);
+        const labels = document.createElement('div');
+        labels.className = 'segLabels';
+        const nameEl = document.createElement('div');
+        nameEl.className = 'segName';
+        nameEl.textContent = seg.item.name;
+        const timeEl = document.createElement('div');
+        timeEl.className = 'segTime';
+        timeEl.textContent = formatClock(segClock) + ' \u00b7 ' + seg.item.minutes + 'm' +
+          (type==='drill' && seg.item.minutes > 2 ? ' (2t+' + (seg.item.minutes-2) + 'p)' : '');
+        labels.appendChild(nameEl); labels.appendChild(timeEl);
+        div.appendChild(labels);
+      }
       planTimeline.appendChild(div);
     });
     if(session.running){
@@ -1694,61 +1877,41 @@ const STANDARD_PLANS = [
         renderPlanPreview(item);
       });
 
-      const summary = document.createElement('div');
-      summary.className = 'planItemSummary';
+      // ---- Line 1: dot, type badge, name, minutes, reorder/remove ----
+      const line1 = document.createElement('div');
+      line1.className = 'planItemLine1';
       const chevron = document.createElement('span');
       chevron.className = 'planItemChevron';
       chevron.textContent = isExpanded ? '\u25be' : '\u25b8';
-      summary.appendChild(chevron);
+      line1.appendChild(chevron);
       const dot = document.createElement('div');
       dot.className = 'dot';
-      summary.appendChild(dot);
+      line1.appendChild(dot);
       const badge = document.createElement('span');
       badge.className = 'planItemBadge type-' + type;
       badge.textContent = type;
-      summary.appendChild(badge);
+      line1.appendChild(badge);
       const name = document.createElement('div');
       name.className = 'planItemName';
       name.textContent = (i+1) + '. ' + item.name;
-      summary.appendChild(name);
-      const clockEl = document.createElement('div');
-      clockEl.className = 'planItemClock';
-      const seg = schedule[i];
-      const segStart = new Date(startTime.getTime() + seg.startSec*1000);
-      const segEnd = new Date(startTime.getTime() + seg.endSec*1000);
-      clockEl.textContent = formatClock(segStart) + ' - ' + formatClock(segEnd);
-      summary.appendChild(clockEl);
-      row.appendChild(summary);
-
-      if(isExpanded){
-        const details = document.createElement('div');
-        details.className = 'planItemDetails';
-        details.addEventListener('click', e=>e.stopPropagation());
-        const controlsRow = document.createElement('div');
-        controlsRow.className = 'planItemDetailsControls';
-
-        if(type==='drill' && item.minutes > 2){
-          const split = document.createElement('div');
-          split.className = 'planItemSplit';
-          split.textContent = '2m talk + ' + (item.minutes-2) + 'm play';
-          controlsRow.appendChild(split);
-        }
-        const durRow = document.createElement('div');
-        durRow.className = 'planItemDurRow';
-        const durLabel = document.createElement('span');
-        durLabel.textContent = 'Minutes:';
-        durRow.appendChild(durLabel);
+      line1.appendChild(name);
+      if(currentPlan.isStandard){
+        const durText = document.createElement('span');
+        durText.className = 'planItemDurStatic';
+        durText.textContent = item.minutes + ' min';
+        line1.appendChild(durText);
+      } else {
         const dur = document.createElement('input');
         dur.type = 'number'; dur.min = '1'; dur.max = '60'; dur.value = item.minutes;
+        dur.addEventListener('click', e=>e.stopPropagation());
         dur.addEventListener('change', ()=>{
           item.minutes = Math.max(1, parseInt(dur.value,10) || 1);
           savePlan(); renderPlanList(); renderTimeline();
         });
-        durRow.appendChild(dur);
-        controlsRow.appendChild(durRow);
-
+        line1.appendChild(dur);
         const btns = document.createElement('div');
         btns.className = 'planItemBtns';
+        btns.addEventListener('click', e=>e.stopPropagation());
         const upBtn = document.createElement('button');
         upBtn.textContent = '\u25b2';
         upBtn.setAttribute('aria-label', 'Move up');
@@ -1775,16 +1938,40 @@ const STANDARD_PLANS = [
           savePlan(); renderPlanList(); renderTimeline();
         });
         btns.appendChild(upBtn); btns.appendChild(downBtn); btns.appendChild(rmBtn);
-        controlsRow.appendChild(btns);
-        details.appendChild(controlsRow);
-
-        const previewInline = document.createElement('div');
-        previewInline.className = 'planItemPreviewInline';
-        previewInline.innerHTML = buildPreviewHTML(item).html;
-        details.appendChild(previewInline);
-
-        row.appendChild(details);
+        line1.appendChild(btns);
       }
+      row.appendChild(line1);
+
+      // ---- Line 2: clock range, talk/play split ----
+      // The very first block of the day never gets a "talk" prep split -- it's
+      // the opener, kids just start, there's nothing to explain beforehand.
+      const line2 = document.createElement('div');
+      line2.className = 'planItemLine2';
+      const seg = schedule[i];
+      const segStart = new Date(startTime.getTime() + seg.startSec*1000);
+      const segEnd = new Date(startTime.getTime() + seg.endSec*1000);
+      const clockEl = document.createElement('span');
+      clockEl.className = 'planItemClock';
+      clockEl.textContent = formatClock(segStart) + ' - ' + formatClock(segEnd);
+      line2.appendChild(clockEl);
+      if(type==='drill' && item.minutes > 2 && i > 0){
+        const split = document.createElement('span');
+        split.className = 'planItemSplit';
+        split.textContent = '2m talk + ' + (item.minutes-2) + 'm play';
+        line2.appendChild(split);
+      }
+      row.appendChild(line2);
+
+      // ---- Expandable: inline diagram/instructions preview (mobile only) ----
+      const details = document.createElement('div');
+      details.className = 'planItemDetails';
+      details.addEventListener('click', e=>e.stopPropagation());
+      const previewInline = document.createElement('div');
+      previewInline.className = 'planItemPreviewInline';
+      previewInline.innerHTML = buildPreviewHTML(item).html;
+      details.appendChild(previewInline);
+      row.appendChild(details);
+
       planList.appendChild(row);
     });
     renderTimeline();
@@ -1943,10 +2130,10 @@ const STANDARD_PLANS = [
     }
     const d = drill.data || {};
     let html = '';
-    const pills = [];
-    if(d.duration_total_mins) pills.push(d.duration_total_mins + ' min');
-    if(d.field_width && d.field_length) pills.push(d.field_width + ' x ' + d.field_length);
-    if(pills.length) html += '<div class="infoPills">' + pills.map(p=>'<span class="infoPill">'+p+'</span>').join('') + '</div>';
+    const sizeBadge = (d.field_width && d.field_length)
+      ? '<span class="infoPill" style="position:absolute;top:8px;right:8px;z-index:2;">' + d.field_width + ' x ' + d.field_length + '</span>'
+      : '';
+    html += '<div style="position:relative;">' + sizeBadge;
     if(Array.isArray(d.tokens) && d.tokens.length){
       html += buildStaticDiagramSVG(d.tokens, { zoneBoxes: d.zoneBoxes, zoneLines: d.zoneLines, connectors: d.connectors });
     } else if(d.diagram_image_url){
@@ -1954,7 +2141,10 @@ const STANDARD_PLANS = [
     } else {
       html += '<p style="color:#8a8a86;">No diagram available yet for this one -- text only.</p>';
     }
+    html += '</div>';
     const instr = d.instructions ? d.instructions.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : 'No instructions recorded.';
+    if(d.aka_note) html += '<div class="adaptedNote akaNote"><b>Also known as:</b> ' + d.aka_note.replace(/^Also known as:\s*/, '') + '</div>';
+    if(d.adapted_note) html += '<div class="adaptedNote"><b>Adapted for our team:</b> ' + d.adapted_note + '</div>';
     html += '<div><h4>Instructions</h4><p>' + instr + '</p></div>';
     if(Array.isArray(d.coaching_points) && d.coaching_points.length){
       html += '<div><h4>Coaching points</h4><ul>' + d.coaching_points.map(p=>'<li>'+p+'</li>').join('') + '</ul></div>';
@@ -1963,9 +2153,57 @@ const STANDARD_PLANS = [
   }
 
   function renderPlanPreview(item){
-    const built = buildPreviewHTML(item);
-    planPreviewHeader.textContent = built.title;
-    planPreviewBody.innerHTML = built.html;
+    const type = itemType(item);
+    if(type !== 'drill'){
+      planPreviewHeader.textContent = item.name;
+      planPreviewDiagramWrap.classList.add('hidden');
+      planPreviewSizeBadge.classList.add('hidden');
+      planPreviewBody.innerHTML = '<p style="color:#8a8a86;">' + (item.note || 'No drill attached to this block.') + '</p>';
+      return;
+    }
+    const drill = resolveDrill(item);
+    if(!drill){
+      planPreviewHeader.textContent = item.name;
+      planPreviewDiagramWrap.classList.add('hidden');
+      planPreviewSizeBadge.classList.add('hidden');
+      planPreviewBody.innerHTML = '<p style="color:#8a8a86;">Could not find this drill in the loaded data.</p>';
+      return;
+    }
+    planPreviewHeader.textContent = drill.name;
+    const d = drill.data || {};
+    let html = '';
+
+    if(Array.isArray(d.tokens) && d.tokens.length){
+      planPreviewDiagramWrap.classList.remove('hidden');
+      loadPreviewSetup(d.tokens, { zoneBoxes: d.zoneBoxes, zoneLines: d.zoneLines, connectors: d.connectors });
+      if(d.field_width && d.field_length){
+        planPreviewSizeBadge.textContent = d.field_width + ' x ' + d.field_length;
+        planPreviewSizeBadge.classList.remove('hidden');
+      } else {
+        planPreviewSizeBadge.classList.add('hidden');
+      }
+    } else {
+      planPreviewDiagramWrap.classList.add('hidden');
+      planPreviewSizeBadge.classList.add('hidden');
+      const sizeBadge = (d.field_width && d.field_length)
+        ? '<span class="infoPill" style="position:absolute;top:8px;right:8px;z-index:2;">' + d.field_width + ' x ' + d.field_length + '</span>'
+        : '';
+      html += '<div style="position:relative;">' + sizeBadge;
+      if(d.diagram_image_url){
+        html += '<img src="'+d.diagram_image_url+'" alt="Drill diagram" style="width:100%;max-height:480px;object-fit:contain;border-radius:4px;background:#fff;">';
+      } else {
+        html += '<p style="color:#8a8a86;">No diagram available yet for this one -- text only.</p>';
+      }
+      html += '</div>';
+    }
+    const instr = d.instructions ? d.instructions.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : 'No instructions recorded.';
+    if(d.aka_note) html += '<div class="adaptedNote akaNote"><b>Also known as:</b> ' + d.aka_note.replace(/^Also known as:\s*/, '') + '</div>';
+    if(d.adapted_note) html += '<div class="adaptedNote"><b>Adapted for our team:</b> ' + d.adapted_note + '</div>';
+    html += '<div><h4>Instructions</h4><p>' + instr + '</p></div>';
+    if(Array.isArray(d.coaching_points) && d.coaching_points.length){
+      html += '<div><h4>Coaching points</h4><ul>' + d.coaching_points.map(p=>'<li>'+p+'</li>').join('') + '</ul></div>';
+    }
+    planPreviewBody.innerHTML = html;
   }
 
   let audioCtx = null;
@@ -2098,35 +2336,32 @@ const STANDARD_PLANS = [
     const name = prompt('Name for the new plan:', 'My Plan');
     if(!name) return;
     const id = 'custom' + Date.now();
-    savedPlans[id] = { id, name: name.trim(), items: [], isStandard: false };
-    savePlans();
+    customPlans[id] = { id, name: name.trim(), items: [], isStandard: false };
+    saveCustomPlans();
     switchToPlan(id);
   });
 
-  document.getElementById('resetStandardBtn').addEventListener('click', ()=>{
-    const std = STANDARD_PLANS.find(sp => sp.id === currentPlanId);
-    if(!std) return;
-    if(!confirm('Reset "' + std.name + '" back to its original standard drills? Any edits you made to it will be lost.')) return;
-    stopSession();
-    savedPlans[currentPlanId].items = JSON.parse(JSON.stringify(std.items));
-    planQueue = savedPlans[currentPlanId].items;
-    savePlans(); renderPlanList();
+  document.getElementById('duplicatePlanBtn').addEventListener('click', ()=>{
+    const name = prompt('Name for the new plan:', currentPlan.name + ' (copy)');
+    if(!name) return;
+    const id = 'custom' + Date.now();
+    customPlans[id] = { id, name: name.trim(), items: JSON.parse(JSON.stringify(currentPlan.items)), isStandard: false };
+    saveCustomPlans();
+    switchToPlan(id);
   });
 
   document.getElementById('renamePlanBtn').addEventListener('click', ()=>{
-    const current = savedPlans[currentPlanId];
-    const name = prompt('Rename this plan:', current.name);
+    const name = prompt('Rename this plan:', currentPlan.name);
     if(!name) return;
-    current.name = name.trim();
-    savePlans(); renderPlanSelector();
+    currentPlan.name = name.trim();
+    saveCustomPlans(); renderPlanSelector();
   });
 
   document.getElementById('deletePlanBtn').addEventListener('click', ()=>{
-    const current = savedPlans[currentPlanId];
-    if(!confirm('Delete "' + current.name + '"? This cannot be undone.')) return;
+    if(!confirm('Delete "' + currentPlan.name + '"? This cannot be undone.')) return;
     stopSession();
-    delete savedPlans[currentPlanId];
-    savePlans();
+    delete customPlans[currentPlanId];
+    saveCustomPlans();
     switchToPlan('standard1');
   });
 
