@@ -43,6 +43,8 @@
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><path d="M0,0 L10,0 L5,6 Z" fill="%238a8a86"/></svg>');
     background-repeat: no-repeat; background-position: right 10px center;
   }
+  select option { color: #111; background: #fff; }
+  #minAge, #maxAge { flex: 0 1 90px; max-width: 90px; }
   #playsSelect { flex: 3 1 260px; }
   #browsePage select {
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><path d="M0,0 L10,0 L5,6 Z" fill="%23d8cdf0"/></svg>');
@@ -82,6 +84,11 @@
   #infoPanelBody h4:first-child { margin-top: 0; }
   #infoPanelBody ul { margin: 0; padding-left: 18px; }
   #infoPanelBody li { margin-bottom: 6px; }
+  .infoPills { display: flex; gap: 6px; margin-bottom: 12px; }
+  .infoPill {
+    font-size: 12px; padding: 4px 10px; border-radius: 12px;
+    background: var(--surface-med); color: var(--text-secondary);
+  }
   #installNote {
     font-size: 12px; color: #6b6b68; text-align: center; padding: 2px 0;
   }
@@ -140,7 +147,24 @@
   #pageNav { display: flex; gap: 8px; align-items: center; }
   .navBtn { flex: 1; justify-content: center; background: #161616; opacity: 0.55; }
   .navBtn.active { background: #1c2b1c; opacity: 1; color: #5fe08a; }
-  #themeSwatches { display: flex; gap: 6px; }
+  #settingsPage {
+    flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;
+    background: radial-gradient(circle at 20% 10%, var(--theme-1), var(--theme-2) 40%, var(--theme-3) 100%);
+    border-radius: 8px; padding: 16px;
+  }
+  #settingsSection { background: var(--panel-bg); border-radius: 8px; padding: 14px 16px; }
+  #settingsSection h3 {
+    font-size: 13px; font-weight: 600; color: var(--text-primary); margin: 0 0 10px;
+    text-transform: none; letter-spacing: normal;
+  }
+  #settingsSection p { font-size: 13px; line-height: 1.6; color: var(--text-body); margin: 0; }
+  #settingsSection ul { margin: 0; padding-left: 20px; }
+  #settingsSection li { font-size: 13px; line-height: 1.6; color: var(--text-body); margin-bottom: 10px; }
+  #settingsSection li b { color: var(--text-primary); }
+  #settingsPage button {
+    background: rgba(255,255,255,0.12); clip-path: none; border-radius: 4px; color: var(--text-primary);
+  }
+  #themeSwatches { display: flex; gap: 10px; }
   .swatch {
     width: 22px; height: 22px; border-radius: 50%; border: 2px solid transparent;
     padding: 0; cursor: pointer; clip-path: none; display: inline-block;
@@ -203,6 +227,9 @@
   #customBlockName { flex: 1; background: var(--surface-strong); color: var(--text-primary); border: none; padding: 10px; font-size: 13px; border-radius: 4px; }
   #customBlockName::placeholder { color: var(--placeholder); }
   #customBlockType { background: var(--surface-strong); color: var(--text-primary); border: none; padding: 10px; font-size: 13px; border-radius: 4px; }
+  #planSelector {
+    background: var(--surface-strong); color: var(--text-primary); flex: 0 1 220px;
+  }
   #customBlockMinutes { width: 60px; background: var(--surface-strong); color: var(--text-primary); border: none; padding: 10px; font-size: 13px; text-align: center; border-radius: 4px; }
   #planMainRow { flex: 1; min-height: 0; display: flex; gap: 10px; }
   #planLeftCol { flex: 0 1 640px; max-width: 640px; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
@@ -214,14 +241,32 @@
     border-bottom: 1px solid var(--surface-med);
   }
   .planItem {
-    display: flex; align-items: center; gap: 8px; cursor: pointer;
-    padding: 9px 14px; border-bottom: 1px solid var(--surface-weak);
+    display: block; cursor: pointer;
+    padding: 0 14px; border-bottom: 1px solid var(--surface-weak);
   }
   .planItem:hover { background: var(--surface-hover); }
+  .planItemSummary { display: flex; align-items: center; gap: 8px; padding: 9px 0; }
+  .planItemChevron { font-size: 11px; color: var(--text-mutedmore); flex-shrink: 0; width: 10px; }
   .planItem .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; background: var(--dot-muted); }
   .planItem.type-break .dot, .planItem.type-custom .dot, .planItem.type-scrimmage .dot { background: #2fd6e0; }
   .planItem.selected, .planItem.current { background: rgba(47,214,224,0.14); }
   .planItem.current .dot { background: #2fd6e0; box-shadow: 0 0 4px #2fd6e0; }
+  .planItem.expanded { background: var(--surface-hover); }
+  .planItemDetails {
+    display: flex; flex-direction: column; gap: 12px;
+    padding: 0 0 14px 18px; cursor: default;
+  }
+  .planItemDetailsControls { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .planItemDurRow { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); }
+  .planItemPreviewInline { display: flex; flex-direction: column; gap: 10px; max-width: 480px; }
+  .planItemPreviewInline svg, .planItemPreviewInline img { width: 100%; max-height: 220px; object-fit: contain; border-radius: 4px; }
+  .planItemPreviewInline img { background: #ffffff; }
+  .planItemPreviewInline h4 {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px;
+    color: var(--text-mutedmore); margin: 0 0 6px; font-weight: 500;
+  }
+  .planItemPreviewInline p { font-size: 13px; line-height: 1.6; color: var(--text-body); margin: 0; }
+  .planItemPreviewInline ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.6; color: var(--text-body); }
   .planItemBadge {
     font-size: 9px; text-transform: uppercase; letter-spacing: 0.3px; padding: 2px 5px;
     border-radius: 3px; flex-shrink: 0; background: var(--surface-strong); color: var(--text-secondary);
@@ -265,13 +310,29 @@
   #planPreviewBody p { font-size: 13px; line-height: 1.6; color: var(--text-body); margin: 0; }
   #planPreviewBody ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.6; color: var(--text-body); }
 
+  .mobileOnly { display: none; }
   @media (max-width: 700px) {
     #app { padding: 6px; gap: 4px; }
-    #pageNav { flex-wrap: wrap; gap: 6px; }
-    #themeSwatches { order: 3; width: 100%; justify-content: center; margin-top: 4px; }
+    #pageNav {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 20;
+      background: #0a0a0a; padding: 8px; margin: 0; gap: 8px;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.4);
+    }
+    #app { padding-bottom: 64px; }
+    .swatch { width: 32px; height: 32px; }
+    #modeToggleBtn { padding: 6px 8px; }
     #controls-row { gap: 6px; }
+    input[type=range] { width: 60px; }
+    #speedOut { display: none; }
+    #playBtn, #addToPlanBtn { padding: 8px 10px; font-size: 12px; }
+    .mobileOnly { display: flex; }
+    #filterRows { display: none; }
+    #filterRows.open { display: block; }
     select { min-width: 0; flex: 1 1 80px; }
     #playsSelect { flex: 1 1 100%; order: -1; }
+    #planSelector { flex: 1 1 100%; order: -1; }
+    #planTopRow { gap: 6px; }
+    #planTopRow button { padding: 8px 10px; font-size: 11px; }
 
     #mainRow { flex-direction: column; }
     #fieldWrap { flex: 0 0 38vh; min-height: 180px; }
@@ -279,13 +340,13 @@
 
     #planMainRow { flex-direction: column; }
     #planLeftCol { flex: 1 1 auto; max-width: none; }
-    #planPreviewPanel { flex: 0 0 220px; min-height: 180px; }
+    #planPreviewPanel { display: none; }
 
     #planTimeline { overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .timelineSeg { min-width: 78px; flex-shrink: 0; }
 
-    .planItem { flex-wrap: wrap; }
-    .planItemName { max-width: none; flex: 1 1 100%; order: -1; margin-bottom: 2px; }
+    .planItemSummary { flex-wrap: wrap; }
+    .planItemName { max-width: none; flex: 1 1 100%; order: -1; margin-bottom: 2px; margin-left: 18px; }
     .planItemClock { min-width: 0; }
 
     #addCustomRow { flex-wrap: wrap; }
@@ -297,16 +358,40 @@
 <body>
 <div id="app" data-theme="purple" data-mode="dark">
   <div id="pageNav">
-    <button id="navBrowseBtn" class="navBtn active"><i class="ti ti-list" aria-hidden="true"></i>Browse drills</button>
     <button id="navPlanBtn" class="navBtn"><i class="ti ti-calendar-time" aria-hidden="true"></i>Plan practice</button>
-    <div id="themeSwatches">
-      <button class="swatch active" data-theme-choice="purple" style="background:#5a1f7a" aria-label="Purple theme"></button>
-      <button class="swatch" data-theme-choice="red" style="background:#7a2020" aria-label="Red theme"></button>
-      <button class="swatch" data-theme-choice="orange" style="background:#7a4a10" aria-label="Orange theme"></button>
-      <button class="swatch" data-theme-choice="teal" style="background:#1f6a5a" aria-label="Teal theme"></button>
-      <button class="swatch" data-theme-choice="blue" style="background:#20407a" aria-label="Blue theme"></button>
+    <button id="navBrowseBtn" class="navBtn active"><i class="ti ti-list" aria-hidden="true"></i>Browse drills</button>
+    <button id="navSettingsBtn" class="navBtn"><i class="ti ti-settings" aria-hidden="true"></i>Settings</button>
+  </div>
+  <div id="settingsPage" class="hidden">
+    <div id="settingsSection">
+      <h3>About this app</h3>
+      <p>This board loads real soccer drills from a Supabase database (sourced from PlayMetrics) and helps you plan and run practices for young players. There are 290 drills total; 22 are tagged specifically for this team's age group, and 16 of those actually scale down to a 6-player team.</p>
     </div>
-    <button id="modeToggleBtn" aria-label="Toggle light/dark mode">☾</button>
+    <div id="settingsSection">
+      <h3>How to use it</h3>
+      <ul>
+        <li><b>Browse drills</b> — filter by age, category, skill level, or diagram type. Tap Play to animate real movement paths where diagram data exists.</li>
+        <li><b>Add to plan</b> sends the currently selected drill to whichever practice is open on the Plan tab — check the plan selector there if it's not where you expect.</li>
+        <li><b>Plan practice</b> — pick from the 8 standard practices (pre-built from approved drills) or create your own with "New plan."</li>
+        <li><b>Tap any row</b> in a plan to expand it — that's where duration, reorder, and remove controls live, along with the drill's diagram and instructions.</li>
+        <li><b>Standard plans</b> can be edited (durations, order, removals), but only <b>custom plans</b> let you add brand-new blocks like water breaks or a scrimmage. "Reset to standard" restores a standard plan's original drills if you've changed it.</li>
+        <li><b>Start session</b> runs a live timer synced to real wall-clock time, so it stays accurate even if the screen locks mid-practice.</li>
+      </ul>
+    </div>
+    <div id="settingsSection">
+      <h3>Color theme</h3>
+      <div id="themeSwatches">
+        <button class="swatch active" data-theme-choice="purple" style="background:#5a1f7a" aria-label="Purple theme"></button>
+        <button class="swatch" data-theme-choice="red" style="background:#7a2020" aria-label="Red theme"></button>
+        <button class="swatch" data-theme-choice="orange" style="background:#7a4a10" aria-label="Orange theme"></button>
+        <button class="swatch" data-theme-choice="teal" style="background:#1f6a5a" aria-label="Teal theme"></button>
+        <button class="swatch" data-theme-choice="blue" style="background:#20407a" aria-label="Blue theme"></button>
+      </div>
+    </div>
+    <div id="settingsSection">
+      <h3>Appearance</h3>
+      <button id="modeToggleBtn" aria-label="Toggle light/dark mode">☾ Switch to light mode</button>
+    </div>
   </div>
   <div id="browsePage">
   <div id="controls-row">
@@ -320,24 +405,29 @@
   <div id="controls-row">
     <label>Plays</label>
     <select id="playsSelect"></select>
-    <label>Age</label>
-    <select id="minAge"><option value="">Min</option></select>
-    <span>to</span>
-    <select id="maxAge"><option value="">Max</option></select>
+    <button id="filtersToggleBtn" class="mobileOnly"><i class="ti ti-filter" aria-hidden="true"></i>Filters</button>
   </div>
-  <div id="controls-row">
-    <label>Category</label>
-    <select id="categoryFilter"><option value="">All</option></select>
-    <label>Level cap</label>
-    <select id="levelFilter"><option value="">All</option></select>
-    <label>Diagram</label>
-    <select id="diagramFilter">
-      <option value="">All</option>
-      <option value="animated">Animated</option>
-      <option value="image">Image</option>
-      <option value="text">Text only</option>
-    </select>
-    <button id="resetFiltersBtn"><i class="ti ti-filter-off" aria-hidden="true"></i>Reset filters</button>
+  <div id="filterRows">
+    <div id="controls-row">
+      <label>Age</label>
+      <select id="minAge"><option value="">Min</option></select>
+      <span>to</span>
+      <select id="maxAge"><option value="">Max</option></select>
+    </div>
+    <div id="controls-row">
+      <label>Category</label>
+      <select id="categoryFilter"><option value="">All</option></select>
+      <label>Level cap</label>
+      <select id="levelFilter"><option value="">All</option></select>
+      <label>Diagram</label>
+      <select id="diagramFilter">
+        <option value="">All</option>
+        <option value="animated">Animated</option>
+        <option value="image">Image</option>
+        <option value="text">Text only</option>
+      </select>
+      <button id="resetFiltersBtn"><i class="ti ti-filter-off" aria-hidden="true"></i>Reset filters</button>
+    </div>
   </div>
   <div id="mainRow">
     <div id="fieldWrap">
@@ -382,11 +472,18 @@
   </div>
   <div id="planPage" class="hidden">
     <div id="planTopRow">
+      <label>Plan</label>
+      <select id="planSelector"></select>
+      <button id="newPlanBtn"><i class="ti ti-plus" aria-hidden="true"></i>New plan</button>
+      <button id="resetStandardBtn" class="hidden"><i class="ti ti-wand" aria-hidden="true"></i>Reset to standard</button>
+      <button id="renamePlanBtn" class="hidden"><i class="ti ti-pencil" aria-hidden="true"></i>Rename</button>
+      <button id="deletePlanBtn" class="hidden"><i class="ti ti-trash" aria-hidden="true"></i>Delete plan</button>
+    </div>
+    <div id="planTopRow">
       <label>Start time</label>
       <input type="time" id="startTimeInput" value="17:30">
       <span id="planTotalsText"></span>
       <span style="flex:1"></span>
-      <button id="loadDefaultBtn"><i class="ti ti-wand" aria-hidden="true"></i>Load default itinerary</button>
       <button id="planClearBtn"><i class="ti ti-trash" aria-hidden="true"></i>Clear plan</button>
     </div>
     <div id="planSeedWarning" class="hidden"></div>
@@ -403,7 +500,7 @@
     </div>
     <div id="planMainRow">
       <div id="planLeftCol">
-        <div id="addCustomRow">
+        <div id="addCustomRow" class="hidden">
           <input type="text" id="customBlockName" placeholder="Custom block name (e.g. Water break)">
           <select id="customBlockType">
             <option value="break">Break</option>
@@ -539,6 +636,10 @@
     const hasImage = !!d.diagram_image_url;
     const instr = d.instructions ? d.instructions.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : 'No instructions recorded.';
     let html = '';
+    const pills = [];
+    if(d.duration_total_mins) pills.push(d.duration_total_mins + ' min');
+    if(d.field_width && d.field_length) pills.push(d.field_width + ' x ' + d.field_length);
+    if(pills.length) html += '<div class="infoPills">' + pills.map(p=>'<span class="infoPill">'+p+'</span>').join('') + '</div>';
     if(!hasDiagram && hasImage) html += '<p style="color:#8a8a86;">Showing the original diagram image — not animated, but the real thing.</p>';
     if(!hasDiagram && !hasImage) html += '<p style="color:#8a8a86;">No diagram available yet for this one — text only.</p>';
     html += '<h4>Instructions</h4><p>' + instr + '</p>';
@@ -709,6 +810,10 @@
     levelFilter.value = '';
     diagramFilter.value = '';
     populatePlaysSelect();
+  });
+
+  document.getElementById('filtersToggleBtn').addEventListener('click', ()=>{
+    document.getElementById('filterRows').classList.toggle('open');
   });
 
   function applyDbDrill(drill){
@@ -906,11 +1011,512 @@
   const startTimeInput = document.getElementById('startTimeInput');
   const planSeedWarning = document.getElementById('planSeedWarning');
 
-  let planQueue = [];
+const STANDARD_PLANS = [
+  {
+    "id": "standard1",
+    "name": "Practice 1",
+    "items": [
+      {
+        "name": "Red Light/Green Light",
+        "minutes": 5,
+        "type": "drill"
+      },
+      {
+        "name": "2 Headed Monster Invasion",
+        "minutes": 7,
+        "type": "drill"
+      },
+      {
+        "name": "Water break",
+        "minutes": 3,
+        "type": "break",
+        "custom": true,
+        "note": "August evening heat + young kids -- keep this non-negotiable."
+      },
+      {
+        "name": "Saber Tooth Squirrels (Scrat) Acorn Hunt",
+        "minutes": 7,
+        "type": "drill"
+      },
+      {
+        "name": "Steal the Treasure",
+        "minutes": 7,
+        "type": "drill"
+      },
+      {
+        "name": "Water break",
+        "minutes": 3,
+        "type": "break",
+        "custom": true,
+        "note": "Second break -- also a good bathroom check for this age group."
+      },
+      {
+        "name": "Combat to Small Goals",
+        "minutes": 6,
+        "type": "drill"
+      },
+      {
+        "name": "Water + line up for scrimmage",
+        "minutes": 2,
+        "type": "break",
+        "custom": true,
+        "note": "Split into two 3v3 groups here."
+      },
+      {
+        "name": "Scrimmage (3v3) vs other team",
+        "minutes": 20,
+        "type": "scrimmage",
+        "custom": true,
+        "note": "Rotate all 6 kids through evenly -- swap at the 10-minute mark so everyone gets ~10 min of game time."
+      }
+    ]
+  },
+  {
+    "id": "standard2",
+    "name": "Practice 2",
+    "items": [
+      {
+        "name": "Red Light/Green Light",
+        "minutes": 5,
+        "type": "drill"
+      },
+      {
+        "name": "4 Surfaces Dribbling to 4 Goals",
+        "minutes": 7,
+        "type": "drill"
+      },
+      {
+        "name": "Water break",
+        "minutes": 3,
+        "type": "break",
+        "custom": true,
+        "note": "August evening heat + young kids -- keep this non-negotiable."
+      },
+      {
+        "name": "Sid the Sloth vs Crash & Eddy",
+        "minutes": 7,
+        "type": "drill"
+      },
+      {
+        "name": "Bulldogs Hunting for Milk-Bones",
+        "minutes": 7,
+        "type": "drill"
+      },
+      {
+        "name": "Water break",
+        "minutes": 3,
+        "type": "break",
+        "custom": true,
+        "note": "Second break -- also a good bathroom check for this age group."
+      },
+      {
+        "name": "Combat to Small Goals",
+        "minutes": 6,
+        "type": "drill"
+      },
+      {
+        "name": "Water + line up for scrimmage",
+        "minutes": 2,
+        "type": "break",
+        "custom": true,
+        "note": "Split into two 3v3 groups here."
+      },
+      {
+        "name": "Scrimmage (3v3) vs other team",
+        "minutes": 20,
+        "type": "scrimmage",
+        "custom": true,
+        "note": "Rotate all 6 kids through evenly -- swap at the 10-minute mark so everyone gets ~10 min of game time."
+      }
+    ]
+  },
+  {
+    "id": "standard3",
+    "name": "Practice 3",
+    "items": [
+      {
+        "name": "Red Light/Green Light",
+        "minutes": 5,
+        "type": "drill"
+      },
+      {
+        "name": "Boston Bulldogs",
+        "minutes": 7,
+        "type": "drill"
+      },
+      {
+        "name": "Water break",
+        "minutes": 3,
+        "type": "break",
+        "custom": true,
+        "note": "August evening heat + young kids -- keep this non-negotiable."
+      },
+      {
+        "name": "Hungry, Hungry Hippos",
+        "minutes": 7,
+        "type": "drill"
+      },
+      {
+        "name": "4 Surfaces Dribbling",
+        "minutes": 7,
+        "type": "drill"
+      },
+      {
+        "name": "Water break",
+        "minutes": 3,
+        "type": "break",
+        "custom": true,
+        "note": "Second break -- also a good bathroom check for this age group."
+      },
+      {
+        "name": "Combat to Small Goals",
+        "minutes": 6,
+        "type": "drill"
+      },
+      {
+        "name": "Water + line up for scrimmage",
+        "minutes": 2,
+        "type": "break",
+        "custom": true,
+        "note": "Split into two 3v3 groups here."
+      },
+      {
+        "name": "Scrimmage (3v3) vs other team",
+        "minutes": 20,
+        "type": "scrimmage",
+        "custom": true,
+        "note": "Rotate all 6 kids through evenly -- swap at the 10-minute mark so everyone gets ~10 min of game time."
+      }
+    ]
+  },
+  {
+    "id": "standard4",
+    "name": "Practice 4",
+    "items": [
+      {
+        "name": "Red Light/Green Light",
+        "minutes": 5,
+        "type": "drill"
+      },
+      {
+        "name": "Police Patrol",
+        "minutes": 7,
+        "type": "drill"
+      },
+      {
+        "name": "Water break",
+        "minutes": 3,
+        "type": "break",
+        "custom": true,
+        "note": "August evening heat + young kids -- keep this non-negotiable."
+      },
+      {
+        "name": "Crushing Monster Trucks",
+        "minutes": 7,
+        "type": "drill"
+      },
+      {
+        "name": "Driving Through Moving Tunnel",
+        "minutes": 7,
+        "type": "drill"
+      },
+      {
+        "name": "Water break",
+        "minutes": 3,
+        "type": "break",
+        "custom": true,
+        "note": "Second break -- also a good bathroom check for this age group."
+      },
+      {
+        "name": "Combat to Small Goals",
+        "minutes": 6,
+        "type": "drill"
+      },
+      {
+        "name": "Water + line up for scrimmage",
+        "minutes": 2,
+        "type": "break",
+        "custom": true,
+        "note": "Split into two 3v3 groups here."
+      },
+      {
+        "name": "Scrimmage (3v3) vs other team",
+        "minutes": 20,
+        "type": "scrimmage",
+        "custom": true,
+        "note": "Rotate all 6 kids through evenly -- swap at the 10-minute mark so everyone gets ~10 min of game time."
+      }
+    ]
+  },
+  {
+    "id": "standard5",
+    "name": "Practice 5",
+    "items": [
+      {
+        "name": "Red Light/Green Light",
+        "minutes": 5,
+        "type": "drill"
+      },
+      {
+        "name": "Through the Gate",
+        "minutes": 7,
+        "type": "drill"
+      },
+      {
+        "name": "Water break",
+        "minutes": 3,
+        "type": "break",
+        "custom": true,
+        "note": "August evening heat + young kids -- keep this non-negotiable."
+      },
+      {
+        "name": "3 Dribbling Stations",
+        "minutes": 7,
+        "type": "drill"
+      },
+      {
+        "name": "2 Headed Monster Invasion",
+        "minutes": 7,
+        "type": "drill"
+      },
+      {
+        "name": "Water break",
+        "minutes": 3,
+        "type": "break",
+        "custom": true,
+        "note": "Second break -- also a good bathroom check for this age group."
+      },
+      {
+        "name": "Combat to Small Goals",
+        "minutes": 6,
+        "type": "drill"
+      },
+      {
+        "name": "Water + line up for scrimmage",
+        "minutes": 2,
+        "type": "break",
+        "custom": true,
+        "note": "Split into two 3v3 groups here."
+      },
+      {
+        "name": "Scrimmage (3v3) vs other team",
+        "minutes": 20,
+        "type": "scrimmage",
+        "custom": true,
+        "note": "Rotate all 6 kids through evenly -- swap at the 10-minute mark so everyone gets ~10 min of game time."
+      }
+    ]
+  },
+  {
+    "id": "standard6",
+    "name": "Practice 6",
+    "items": [
+      {
+        "name": "Red Light/Green Light",
+        "minutes": 5,
+        "type": "drill"
+      },
+      {
+        "name": "Saber Tooth Squirrels (Scrat) Acorn Hunt",
+        "minutes": 7,
+        "type": "drill"
+      },
+      {
+        "name": "Water break",
+        "minutes": 3,
+        "type": "break",
+        "custom": true,
+        "note": "August evening heat + young kids -- keep this non-negotiable."
+      },
+      {
+        "name": "Steal the Treasure",
+        "minutes": 7,
+        "type": "drill"
+      },
+      {
+        "name": "4 Surfaces Dribbling to 4 Goals",
+        "minutes": 7,
+        "type": "drill"
+      },
+      {
+        "name": "Water break",
+        "minutes": 3,
+        "type": "break",
+        "custom": true,
+        "note": "Second break -- also a good bathroom check for this age group."
+      },
+      {
+        "name": "Combat to Small Goals",
+        "minutes": 6,
+        "type": "drill"
+      },
+      {
+        "name": "Water + line up for scrimmage",
+        "minutes": 2,
+        "type": "break",
+        "custom": true,
+        "note": "Split into two 3v3 groups here."
+      },
+      {
+        "name": "Scrimmage (3v3) vs other team",
+        "minutes": 20,
+        "type": "scrimmage",
+        "custom": true,
+        "note": "Rotate all 6 kids through evenly -- swap at the 10-minute mark so everyone gets ~10 min of game time."
+      }
+    ]
+  },
+  {
+    "id": "standard7",
+    "name": "Practice 7",
+    "items": [
+      {
+        "name": "Red Light/Green Light",
+        "minutes": 5,
+        "type": "drill"
+      },
+      {
+        "name": "Sid the Sloth vs Crash & Eddy",
+        "minutes": 7,
+        "type": "drill"
+      },
+      {
+        "name": "Water break",
+        "minutes": 3,
+        "type": "break",
+        "custom": true,
+        "note": "August evening heat + young kids -- keep this non-negotiable."
+      },
+      {
+        "name": "Bulldogs Hunting for Milk-Bones",
+        "minutes": 7,
+        "type": "drill"
+      },
+      {
+        "name": "Boston Bulldogs",
+        "minutes": 7,
+        "type": "drill"
+      },
+      {
+        "name": "Water break",
+        "minutes": 3,
+        "type": "break",
+        "custom": true,
+        "note": "Second break -- also a good bathroom check for this age group."
+      },
+      {
+        "name": "Combat to Small Goals",
+        "minutes": 6,
+        "type": "drill"
+      },
+      {
+        "name": "Water + line up for scrimmage",
+        "minutes": 2,
+        "type": "break",
+        "custom": true,
+        "note": "Split into two 3v3 groups here."
+      },
+      {
+        "name": "Scrimmage (3v3) vs other team",
+        "minutes": 20,
+        "type": "scrimmage",
+        "custom": true,
+        "note": "Rotate all 6 kids through evenly -- swap at the 10-minute mark so everyone gets ~10 min of game time."
+      }
+    ]
+  },
+  {
+    "id": "standard8",
+    "name": "Practice 8",
+    "items": [
+      {
+        "name": "Red Light/Green Light",
+        "minutes": 5,
+        "type": "drill"
+      },
+      {
+        "name": "Hungry, Hungry Hippos",
+        "minutes": 7,
+        "type": "drill"
+      },
+      {
+        "name": "Water break",
+        "minutes": 3,
+        "type": "break",
+        "custom": true,
+        "note": "August evening heat + young kids -- keep this non-negotiable."
+      },
+      {
+        "name": "4 Surfaces Dribbling",
+        "minutes": 7,
+        "type": "drill"
+      },
+      {
+        "name": "Police Patrol",
+        "minutes": 7,
+        "type": "drill"
+      },
+      {
+        "name": "Water break",
+        "minutes": 3,
+        "type": "break",
+        "custom": true,
+        "note": "Second break -- also a good bathroom check for this age group."
+      },
+      {
+        "name": "Combat to Small Goals",
+        "minutes": 6,
+        "type": "drill"
+      },
+      {
+        "name": "Water + line up for scrimmage",
+        "minutes": 2,
+        "type": "break",
+        "custom": true,
+        "note": "Split into two 3v3 groups here."
+      },
+      {
+        "name": "Scrimmage (3v3) vs other team",
+        "minutes": 20,
+        "type": "scrimmage",
+        "custom": true,
+        "note": "Rotate all 6 kids through evenly -- swap at the 10-minute mark so everyone gets ~10 min of game time."
+      }
+    ]
+  }
+];
+
+  function loadSavedPlans(){
+    try {
+      const raw = localStorage.getItem('soccerBoardPlans');
+      const parsed = raw ? JSON.parse(raw) : {};
+      // Make sure all 8 standard plans exist. Never overwrite a standard plan
+      // that's already saved (that's the user's edited version) -- only add
+      // ones that are missing (first run, or a plan that got deleted).
+      STANDARD_PLANS.forEach(sp=>{
+        if(!parsed[sp.id]){
+          parsed[sp.id] = { id: sp.id, name: sp.name, items: JSON.parse(JSON.stringify(sp.items)), isStandard: true };
+        }
+      });
+      return parsed;
+    } catch(e){
+      const fresh = {};
+      STANDARD_PLANS.forEach(sp=>{
+        fresh[sp.id] = { id: sp.id, name: sp.name, items: JSON.parse(JSON.stringify(sp.items)), isStandard: true };
+      });
+      return fresh;
+    }
+  }
+
+  let savedPlans = loadSavedPlans();
+  let currentPlanId = 'standard1';
   try {
-    const saved = localStorage.getItem('practicePlan');
-    if(saved) planQueue = JSON.parse(saved);
-  } catch(e){ planQueue = []; }
+    const savedCurrent = localStorage.getItem('soccerBoardCurrentPlanId');
+    if(savedCurrent && savedPlans[savedCurrent]) currentPlanId = savedCurrent;
+  } catch(e){}
+
+  let planQueue = savedPlans[currentPlanId].items;
+
   try {
     const savedStart = localStorage.getItem('practiceStartTime');
     if(savedStart) startTimeInput.value = savedStart;
@@ -918,8 +1524,54 @@
 
   let session = { running:false, paused:false, index:-1, remaining:0, intervalId:null, startedAt:null, plannedTotalSec:0 };
 
-  function savePlan(){
-    try { localStorage.setItem('practicePlan', JSON.stringify(planQueue)); } catch(e){}
+  function savePlans(){
+    try { localStorage.setItem('soccerBoardPlans', JSON.stringify(savedPlans)); } catch(e){}
+  }
+  // kept as an alias so all the existing call sites (which say savePlan())
+  // don't need touching -- it just persists the whole plan collection now.
+  function savePlan(){ savePlans(); }
+
+  function resolveDrill(item){
+    if(item.id != null){
+      const byId = dbDrills.find(d => String(d.id) === String(item.id));
+      if(byId) return byId;
+    }
+    return dbDrills.find(d => d.name === item.name);
+  }
+
+  function switchToPlan(planId){
+    if(!savedPlans[planId]) return;
+    if(session.running) stopSession();
+    currentPlanId = planId;
+    planQueue = savedPlans[planId].items;
+    selectedPlanIndex = -1;
+    expandedRows.clear();
+    try { localStorage.setItem('soccerBoardCurrentPlanId', planId); } catch(e){}
+    renderPlanSelector();
+    renderPlanList();
+    planPreviewHeader.textContent = 'Tap a row to preview it here';
+    planPreviewBody.innerHTML = '';
+  }
+
+  function renderPlanSelector(){
+    const sel = document.getElementById('planSelector');
+    sel.innerHTML = '';
+    STANDARD_PLANS.forEach(sp=>{
+      const o = document.createElement('option');
+      o.value = sp.id; o.textContent = savedPlans[sp.id].name;
+      sel.appendChild(o);
+    });
+    Object.keys(savedPlans).filter(id => !savedPlans[id].isStandard).forEach(id=>{
+      const o = document.createElement('option');
+      o.value = id; o.textContent = savedPlans[id].name;
+      sel.appendChild(o);
+    });
+    sel.value = currentPlanId;
+    const isStandard = savedPlans[currentPlanId].isStandard;
+    document.getElementById('resetStandardBtn').classList.toggle('hidden', !isStandard);
+    document.getElementById('renamePlanBtn').classList.toggle('hidden', isStandard);
+    document.getElementById('deletePlanBtn').classList.toggle('hidden', isStandard);
+    document.getElementById('addCustomRow').classList.toggle('hidden', isStandard);
   }
 
   function formatTime(sec){
@@ -1011,6 +1663,7 @@
   }
 
   let selectedPlanIndex = -1;
+  let expandedRows = new Set();
 
   function renderPlanList(){
     const schedule = computeSchedule();
@@ -1028,76 +1681,110 @@
     }
     planQueue.forEach((item, i)=>{
       const type = itemType(item);
+      const isExpanded = expandedRows.has(i);
       const row = document.createElement('div');
       row.className = 'planItem type-' + type
         + (session.running && i===session.index ? ' current' : '')
-        + (i===selectedPlanIndex ? ' selected' : '');
+        + (i===selectedPlanIndex ? ' selected' : '')
+        + (isExpanded ? ' expanded' : '');
       row.addEventListener('click', ()=>{
+        if(expandedRows.has(i)) expandedRows.delete(i); else expandedRows.add(i);
         selectedPlanIndex = i;
         renderPlanList();
         renderPlanPreview(item);
       });
+
+      const summary = document.createElement('div');
+      summary.className = 'planItemSummary';
+      const chevron = document.createElement('span');
+      chevron.className = 'planItemChevron';
+      chevron.textContent = isExpanded ? '\u25be' : '\u25b8';
+      summary.appendChild(chevron);
       const dot = document.createElement('div');
       dot.className = 'dot';
-      row.appendChild(dot);
+      summary.appendChild(dot);
       const badge = document.createElement('span');
       badge.className = 'planItemBadge type-' + type;
       badge.textContent = type;
-      row.appendChild(badge);
+      summary.appendChild(badge);
       const name = document.createElement('div');
       name.className = 'planItemName';
       name.textContent = (i+1) + '. ' + item.name;
-      row.appendChild(name);
-      if(type==='drill' && item.minutes > 2){
-        const split = document.createElement('div');
-        split.className = 'planItemSplit';
-        split.textContent = '2m talk + ' + (item.minutes-2) + 'm play';
-        row.appendChild(split);
-      }
+      summary.appendChild(name);
       const clockEl = document.createElement('div');
       clockEl.className = 'planItemClock';
       const seg = schedule[i];
       const segStart = new Date(startTime.getTime() + seg.startSec*1000);
       const segEnd = new Date(startTime.getTime() + seg.endSec*1000);
       clockEl.textContent = formatClock(segStart) + ' - ' + formatClock(segEnd);
-      row.appendChild(clockEl);
-      const dur = document.createElement('input');
-      dur.type = 'number'; dur.min = '1'; dur.max = '60'; dur.value = item.minutes;
-      dur.addEventListener('click', e=>e.stopPropagation());
-      dur.addEventListener('change', ()=>{
-        item.minutes = Math.max(1, parseInt(dur.value,10) || 1);
-        savePlan(); renderPlanList(); renderTimeline();
-      });
-      row.appendChild(dur);
-      const btns = document.createElement('div');
-      btns.className = 'planItemBtns';
-      btns.addEventListener('click', e=>e.stopPropagation());
-      const upBtn = document.createElement('button');
-      upBtn.textContent = '\u25b2';
-      upBtn.setAttribute('aria-label', 'Move up');
-      upBtn.disabled = i===0;
-      upBtn.addEventListener('click', ()=>{
-        [planQueue[i-1], planQueue[i]] = [planQueue[i], planQueue[i-1]];
-        savePlan(); renderPlanList(); renderTimeline();
-      });
-      const downBtn = document.createElement('button');
-      downBtn.textContent = '\u25bc';
-      downBtn.setAttribute('aria-label', 'Move down');
-      downBtn.disabled = i===planQueue.length-1;
-      downBtn.addEventListener('click', ()=>{
-        [planQueue[i+1], planQueue[i]] = [planQueue[i], planQueue[i+1]];
-        savePlan(); renderPlanList(); renderTimeline();
-      });
-      const rmBtn = document.createElement('button');
-      rmBtn.textContent = '\u2715';
-      rmBtn.setAttribute('aria-label', 'Remove');
-      rmBtn.addEventListener('click', ()=>{
-        if(session.running && i===session.index) stopSession();
-        planQueue.splice(i,1);
-        savePlan(); renderPlanList(); renderTimeline();
-      });
-      btns.appendChild(upBtn); btns.appendChild(downBtn); btns.appendChild(rmBtn);
-      row.appendChild(btns);
+      summary.appendChild(clockEl);
+      row.appendChild(summary);
+
+      if(isExpanded){
+        const details = document.createElement('div');
+        details.className = 'planItemDetails';
+        details.addEventListener('click', e=>e.stopPropagation());
+        const controlsRow = document.createElement('div');
+        controlsRow.className = 'planItemDetailsControls';
+
+        if(type==='drill' && item.minutes > 2){
+          const split = document.createElement('div');
+          split.className = 'planItemSplit';
+          split.textContent = '2m talk + ' + (item.minutes-2) + 'm play';
+          controlsRow.appendChild(split);
+        }
+        const durRow = document.createElement('div');
+        durRow.className = 'planItemDurRow';
+        const durLabel = document.createElement('span');
+        durLabel.textContent = 'Minutes:';
+        durRow.appendChild(durLabel);
+        const dur = document.createElement('input');
+        dur.type = 'number'; dur.min = '1'; dur.max = '60'; dur.value = item.minutes;
+        dur.addEventListener('change', ()=>{
+          item.minutes = Math.max(1, parseInt(dur.value,10) || 1);
+          savePlan(); renderPlanList(); renderTimeline();
+        });
+        durRow.appendChild(dur);
+        controlsRow.appendChild(durRow);
+
+        const btns = document.createElement('div');
+        btns.className = 'planItemBtns';
+        const upBtn = document.createElement('button');
+        upBtn.textContent = '\u25b2';
+        upBtn.setAttribute('aria-label', 'Move up');
+        upBtn.disabled = i===0;
+        upBtn.addEventListener('click', ()=>{
+          [planQueue[i-1], planQueue[i]] = [planQueue[i], planQueue[i-1]];
+          savePlan(); renderPlanList(); renderTimeline();
+        });
+        const downBtn = document.createElement('button');
+        downBtn.textContent = '\u25bc';
+        downBtn.setAttribute('aria-label', 'Move down');
+        downBtn.disabled = i===planQueue.length-1;
+        downBtn.addEventListener('click', ()=>{
+          [planQueue[i+1], planQueue[i]] = [planQueue[i], planQueue[i+1]];
+          savePlan(); renderPlanList(); renderTimeline();
+        });
+        const rmBtn = document.createElement('button');
+        rmBtn.textContent = '\u2715';
+        rmBtn.setAttribute('aria-label', 'Remove');
+        rmBtn.addEventListener('click', ()=>{
+          if(session.running && i===session.index) stopSession();
+          planQueue.splice(i,1);
+          expandedRows.delete(i);
+          savePlan(); renderPlanList(); renderTimeline();
+        });
+        btns.appendChild(upBtn); btns.appendChild(downBtn); btns.appendChild(rmBtn);
+        controlsRow.appendChild(btns);
+        details.appendChild(controlsRow);
+
+        const previewInline = document.createElement('div');
+        previewInline.className = 'planItemPreviewInline';
+        previewInline.innerHTML = buildPreviewHTML(item).html;
+        details.appendChild(previewInline);
+
+        row.appendChild(details);
+      }
       planList.appendChild(row);
     });
     renderTimeline();
@@ -1108,12 +1795,11 @@
     renderPlanList();
   });
 
-  // default duration: use the matching DEFAULT_ITINERARY value if this exact drill
-  // is part of it, otherwise fall back to 7 minutes (realistic attention span for
+  // default duration: prefer the drill's own real PlayMetrics duration if we
+  // have it, otherwise fall back to 7 minutes (realistic attention span for
   // young kids), not a generic 10.
-  function defaultDurationFor(name){
-    const match = DEFAULT_ITINERARY.find(d => d.name === name);
-    return match ? match.minutes : 7;
+  function defaultDurationFor(drill){
+    return (drill.data && drill.data.duration_total_mins) || 7;
   }
 
   document.getElementById('addToPlanBtn').addEventListener('click', ()=>{
@@ -1122,7 +1808,7 @@
     const id = val.split(':')[1];
     const drill = dbDrills.find(d => String(d.id) === String(id));
     if(!drill) return;
-    planQueue.push({ id: drill.id, name: drill.name, minutes: defaultDurationFor(drill.name), type: 'drill' });
+    planQueue.push({ id: drill.id, name: drill.name, minutes: defaultDurationFor(drill), type: 'drill' });
     savePlan(); renderPlanList();
   });
 
@@ -1143,17 +1829,24 @@
   const planPage = document.getElementById('planPage');
   const navBrowseBtn = document.getElementById('navBrowseBtn');
   const navPlanBtn = document.getElementById('navPlanBtn');
+  const settingsPage = document.getElementById('settingsPage');
+  const navSettingsBtn = document.getElementById('navSettingsBtn');
+
   function showPage(page){
     browsePage.classList.toggle('hidden', page!=='browse');
     planPage.classList.toggle('hidden', page!=='plan');
+    settingsPage.classList.toggle('hidden', page!=='settings');
     navBrowseBtn.classList.toggle('active', page==='browse');
     navPlanBtn.classList.toggle('active', page==='plan');
+    navSettingsBtn.classList.toggle('active', page==='settings');
     if(page==='plan'){ renderPlanList(); }
   }
   navBrowseBtn.addEventListener('click', ()=>showPage('browse'));
   navPlanBtn.addEventListener('click', ()=>showPage('plan'));
+  navSettingsBtn.addEventListener('click', ()=>showPage('settings'));
 
   const appEl = document.getElementById('app');
+
   const swatches = document.querySelectorAll('.swatch');
   function applyTheme(name){
     appEl.setAttribute('data-theme', name);
@@ -1170,7 +1863,7 @@
   function applyMode(mode){
     appEl.setAttribute('data-mode', mode);
     document.body.classList.toggle('mode-light', mode==='light');
-    modeToggleBtn.textContent = mode==='light' ? '\u2600' : '\u263e';
+    modeToggleBtn.textContent = mode==='light' ? '\u2600 Switch to dark mode' : '\u263e Switch to light mode';
     try { localStorage.setItem('boardMode', mode); } catch(e){}
   }
   modeToggleBtn.addEventListener('click', ()=>{
@@ -1239,22 +1932,21 @@
   const planPreviewHeader = document.getElementById('planPreviewHeader');
   const planPreviewBody = document.getElementById('planPreviewBody');
 
-  function renderPlanPreview(item){
+  function buildPreviewHTML(item){
     const type = itemType(item);
     if(type !== 'drill'){
-      planPreviewHeader.textContent = item.name;
-      planPreviewBody.innerHTML = '<p style="color:#8a8a86;">' + (item.note || 'No drill attached to this block.') + '</p>';
-      return;
+      return { title: item.name, html: '<p style="color:#8a8a86;">' + (item.note || 'No drill attached to this block.') + '</p>' };
     }
-    const drill = dbDrills.find(d => String(d.id) === String(item.id));
+    const drill = resolveDrill(item);
     if(!drill){
-      planPreviewHeader.textContent = item.name;
-      planPreviewBody.innerHTML = '<p style="color:#8a8a86;">Could not find this drill in the loaded data.</p>';
-      return;
+      return { title: item.name, html: '<p style="color:#8a8a86;">Could not find this drill in the loaded data.</p>' };
     }
-    planPreviewHeader.textContent = drill.name;
     const d = drill.data || {};
     let html = '';
+    const pills = [];
+    if(d.duration_total_mins) pills.push(d.duration_total_mins + ' min');
+    if(d.field_width && d.field_length) pills.push(d.field_width + ' x ' + d.field_length);
+    if(pills.length) html += '<div class="infoPills">' + pills.map(p=>'<span class="infoPill">'+p+'</span>').join('') + '</div>';
     if(Array.isArray(d.tokens) && d.tokens.length){
       html += buildStaticDiagramSVG(d.tokens, { zoneBoxes: d.zoneBoxes, zoneLines: d.zoneLines, connectors: d.connectors });
     } else if(d.diagram_image_url){
@@ -1267,7 +1959,13 @@
     if(Array.isArray(d.coaching_points) && d.coaching_points.length){
       html += '<div><h4>Coaching points</h4><ul>' + d.coaching_points.map(p=>'<li>'+p+'</li>').join('') + '</ul></div>';
     }
-    planPreviewBody.innerHTML = html;
+    return { title: drill.name, html: html };
+  }
+
+  function renderPlanPreview(item){
+    const built = buildPreviewHTML(item);
+    planPreviewHeader.textContent = built.title;
+    planPreviewBody.innerHTML = built.html;
   }
 
   let audioCtx = null;
@@ -1306,10 +2004,12 @@
       infoPanelTitle.textContent = item.name;
       infoPanelBody.innerHTML = '<p style="color:#8a8a86;">' + (item.note || 'No drill to display for this block.') + '</p>';
     } else {
-      const drill = dbDrills.find(d => String(d.id) === String(item.id));
+      const drill = resolveDrill(item);
       applyDbDrill(drill);
-      const opt = Array.from(playsSelect.options).find(o=>o.value==='db:'+item.id);
-      if(opt) playsSelect.value = opt.value;
+      if(drill){
+        const opt = Array.from(playsSelect.options).find(o=>o.value==='db:'+drill.id);
+        if(opt) playsSelect.value = opt.value;
+      }
       renderInfoPanel();
     }
     planNowPlaying.textContent = 'Now: ' + item.name + ' (' + (i+1) + ' of ' + planQueue.length + ')';
@@ -1386,53 +2086,51 @@
 
   document.getElementById('planClearBtn').addEventListener('click', ()=>{
     stopSession();
-    planQueue = [];
+    planQueue.length = 0;
     savePlan(); renderPlanList();
   });
 
-  const DEFAULT_ITINERARY = [
-    { name: 'Red Light/Green Light', minutes: 5, type: 'drill' },
-    { name: 'Hungry, Hungry Hippos', minutes: 7, type: 'drill' },
-    { name: 'Water break', minutes: 3, custom: true, type: 'break', note: 'August evening heat + young kids -- keep this non-negotiable.' },
-    { name: 'Boston Bulldogs', minutes: 7, type: 'drill' },
-    { name: 'Sid the Sloth vs Crash & Eddy', minutes: 7, type: 'drill' },
-    { name: 'Water break', minutes: 3, custom: true, type: 'break', note: 'Second break -- also a good bathroom check for this age group.' },
-    { name: 'Combat to Small Goals', minutes: 6, type: 'drill' },
-    { name: 'Water + line up for scrimmage', minutes: 2, custom: true, type: 'break', note: 'Split into two 3v3 groups here.' },
-    { name: 'Scrimmage (3v3) vs other team', minutes: 20, custom: true, type: 'scrimmage', note: 'Rotate all 6 kids through evenly -- e.g. swap at the 10-minute mark so everyone gets ~10 min of game time.' }
-  ];
-
-  function normalizeName(s){
-    return (s||'').trim().toLowerCase().replace(/\s+/g,' ');
-  }
-
-  document.getElementById('loadDefaultBtn').addEventListener('click', ()=>{
-    if(planQueue.length && !confirm('This replaces your current plan with the default itinerary. Continue?')) return;
-    const built = [];
-    const missed = [];
-    DEFAULT_ITINERARY.forEach(item=>{
-      if(item.custom){
-        built.push({ id: null, name: item.name, minutes: item.minutes, custom: true, type: item.type, note: item.note });
-      } else {
-        let drill = dbDrills.find(d => d.name === item.name);
-        if(!drill) drill = dbDrills.find(d => normalizeName(d.name) === normalizeName(item.name));
-        if(drill){
-          built.push({ id: drill.id, name: drill.name, minutes: item.minutes, type: 'drill' });
-        } else {
-          missed.push(item.name);
-        }
-      }
-    });
-    planQueue = built;
-    savePlan(); renderPlanList();
-    if(missed.length){
-      planSeedWarning.classList.remove('hidden');
-      planSeedWarning.textContent = 'Could not find these drills in your Supabase data (check exact spelling/name there): ' + missed.join(', ');
-    } else {
-      planSeedWarning.classList.add('hidden');
-    }
+  document.getElementById('planSelector').addEventListener('change', (e)=>{
+    switchToPlan(e.target.value);
   });
 
+  document.getElementById('newPlanBtn').addEventListener('click', ()=>{
+    const name = prompt('Name for the new plan:', 'My Plan');
+    if(!name) return;
+    const id = 'custom' + Date.now();
+    savedPlans[id] = { id, name: name.trim(), items: [], isStandard: false };
+    savePlans();
+    switchToPlan(id);
+  });
+
+  document.getElementById('resetStandardBtn').addEventListener('click', ()=>{
+    const std = STANDARD_PLANS.find(sp => sp.id === currentPlanId);
+    if(!std) return;
+    if(!confirm('Reset "' + std.name + '" back to its original standard drills? Any edits you made to it will be lost.')) return;
+    stopSession();
+    savedPlans[currentPlanId].items = JSON.parse(JSON.stringify(std.items));
+    planQueue = savedPlans[currentPlanId].items;
+    savePlans(); renderPlanList();
+  });
+
+  document.getElementById('renamePlanBtn').addEventListener('click', ()=>{
+    const current = savedPlans[currentPlanId];
+    const name = prompt('Rename this plan:', current.name);
+    if(!name) return;
+    current.name = name.trim();
+    savePlans(); renderPlanSelector();
+  });
+
+  document.getElementById('deletePlanBtn').addEventListener('click', ()=>{
+    const current = savedPlans[currentPlanId];
+    if(!confirm('Delete "' + current.name + '"? This cannot be undone.')) return;
+    stopSession();
+    delete savedPlans[currentPlanId];
+    savePlans();
+    switchToPlan('standard1');
+  });
+
+  renderPlanSelector();
   renderPlanList();
 
   render();
